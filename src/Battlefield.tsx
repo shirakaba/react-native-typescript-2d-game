@@ -19,6 +19,16 @@ interface State {
 }
 
 export class Box extends Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            speed: 1,
+            size: this.props.size,
+            left: this.props.initialLeft,
+            top: this.props.initialTop
+        };
+    }
+
     render() {
         const combinedStyles: Partial<ViewStyle> = {
             backgroundColor: this.props.colour,
