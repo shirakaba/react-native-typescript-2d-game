@@ -51,7 +51,7 @@ export type ComponentStyle = ViewStyle|ImageStyle|TextStyle;
 export interface StyleObject {
     [key: string]: Partial<ComponentStyle>;
 }
-export interface BattlefieldStyleObject extends StyleObject {
+export interface BoxStyleObject extends StyleObject {
     boxItself: Partial<ViewStyle>;
 }
 
@@ -63,8 +63,3 @@ const styles: StyleObject = StyleSheet.create<StyleObject>({
         borderWidth: 1,
     }
 });
-
-console.log(styles);
-console.log(styles.boxItself);
-console.log(typeof styles);
-
