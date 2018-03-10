@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@types/expo": "^25.0.0",
+    "@types/react": "^16.0.40",
+    "@types/react-native": "^0.52.16",
     "jest-expo": "25.0.0",
     "react-native-scripts": "1.11.1",
     "react-native-typescript-transformer": "^1.2.3",

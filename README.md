@@ -8,7 +8,9 @@ What is Expo: https://stackoverflow.com/questions/39170622/what-is-the-differenc
 
 * **To create a new project *with* Expo:** `create-react-native-app TheBox`, first following the previous link's 'Getting Started' tab alongside the corresponding React Community [GitHub page](https://github.com/react-community/create-react-native-app) to install the prerequisites (`create-react-native-app`, `node`, and likely also `watchman`).
 
-I created a project *with* Expo. This produced the success response:
+I created a project *with* Expo. If you want to create a project without it, then follow Saket Sinha's blog post instead: [ReactNative-Starter-with-TypeScript](https://medium.com/@saketsinha23/reactnative-starter-with-typescript-4af9527e9142).
+
+Creating the project produced the following success response:
 
 > Success! Created TheBox at: `/Users/jamie/Documents/git/TheBox`.
 > Inside that directory, you can run several commands:
@@ -49,7 +51,7 @@ Before doing any of these steps, I decided to integrate TypeScript by following 
 
 2: `touch rn-cli.config.js` and write the following into it:
 
-```TypeScript
+```JavaScript
 module.exports = {  
   getTransformModulePath() {
     return require.resolve('react-native-typescript-transformer')
@@ -76,6 +78,8 @@ module.exports = {
 
 4: Now refer to cbrevik's [react-native-typescript-starter](https://github.com/cbrevik/react-native-typescript-starter) project for an example working project.
 
+If there are any problems specifically with TypeScript (eg. due to circular dependencies), refer to [ds300's react-native-typescript-transformer](https://github.com/ds300/react-native-typescript-transformer) GitHub project.
+ 
 # First build
 
 If you've cloned the git repo at this step (and therefore didn't get them installed as part of the setup), get all the dependencies with:
