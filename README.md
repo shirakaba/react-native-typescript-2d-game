@@ -75,3 +75,38 @@ module.exports = {
 ```
 
 4: Now refer to cbrevik's [react-native-typescript-starter](https://github.com/cbrevik/react-native-typescript-starter) project for an example working project.
+
+# First build
+
+If you've cloned the git repo at this step (and therefore didn't get them installed as part of the setup), get all the dependencies with:
+
+```yarn install```
+
+Now, ensure that you don't have anything running on port 8081, as it will be used by the Metro Bundler (the packager) in the next step:
+
+```
+sudo lsof -i :8081      # Returns either an empty string (good) or a list of process' pids.
+kill -9 <relevant pid>  # Kill each process by its pid number until port 8081 is free.
+```
+
+Next, as in the `create-react-native-app` init instructions, run:
+
+```yarn run ios```
+
+This should automatically start the simulator, open Expo, and start building the JavaScript bundle for the first time. It'll also give you a QR code to access your app.
+
+Successful building of the app is indicated by a message like "17:40:52: Finished building JavaScript bundle in 45268ms", with the app appearing in your simulator.
+
+# Troubleshooting
+
+* `sudo lsof -i :8081` and `kill -9 <relevant pid>`, as described before.
+
+* Delete the `ios/build` folder.
+
+* Optionally delete the `node_modules` folder, perhaps also `yarn.lock` and perform a new `yarn install`.
+
+* Optionally open a new terminal (in case you deleted build files whilst the packager was using them, and their symlinks have become cached)
+
+* Remember to empty your Trash, as you'll have just deleted some big folders.
+
+* Try passing the `--reset-cache` flag to React Native's packager somehow. Create React Native App's [User Guide](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md#npm-start) mentions in the `npm start` section that `yarn start -- --reset-cache` is how to "run the app in development mode". Thus, you could perhaps try rewriting this command for iOS as something like `yarn run ios -- --reset-cache`?
