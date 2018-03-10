@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "react-native-scripts": "1.11.1",
     "jest-expo": "25.0.0",
-    "react-test-renderer": "16.2.0"
+    "react-native-scripts": "1.11.1",
+    "react-native-typescript-transformer": "^1.2.3",
+    "react-test-renderer": "16.2.0",
+    "typescript": "^2.7.2"
   },
   "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
   "scripts": {
