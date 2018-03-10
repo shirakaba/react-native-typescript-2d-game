@@ -3,7 +3,9 @@ import {View, StyleSheet, Text, ViewStyle, TextStyle, ImageStyle, RegisteredStyl
 
 interface Props {
     size: number,
-    colour: string
+    colour: string,
+    initialLeft: number,
+    initialTop: number,
     // count: number,
     // increment: () => any,
     // decrement: () => any
@@ -14,21 +16,16 @@ export class Box extends Component<Props, {}> {
         const combinedStyles: Partial<ViewStyle> = {
             // ...styles.boxItself,
             backgroundColor: this.props.colour,
+            left: this.props.initialLeft,
+            top: this.props.initialTop,
             width: this.props.size,
-            height: this.props.size
+            height: this.props.size,
+            position: "absolute"
         };
 
         return (
             <View
                 style={[styles.boxItself, combinedStyles]}
-                // style={combinedStyles}
-                // style={Object.assign({}, styles.boxItself, combinedStyles)}
-                // style={{
-                //     // ...styles.boxItself,
-                //     width: this.props.size,
-                //     height: this.props.size,
-                // }}
-                // width={this.props.width}
             />
         );
     }
@@ -43,19 +40,13 @@ export interface BattlefieldStyleObject extends StyleObject {
     boxItself: Partial<ViewStyle>;
 }
 
-// export type CreatedStyleSheet<P, T> = { [P in keyof T]: RegisteredStyle<T[P]> }
-// export type CreatedStyleSheet<T extends NamedStyles<T>> = { [P in keyof T]: RegisteredStyle<T[P]> }
-// export type CreatedStyleSheet<T extends NamedStyles<T>> = { [P in keyof T]: RegisteredStyle<T[P]> }
-
-// const styles: CreatedStyleSheet<StyleObject> = StyleSheet.create<StyleObject>({
 const styles: StyleObject = StyleSheet.create<StyleObject>({
     boxItself: {
         // backgroundColor: "red",
         borderColor: "black",
         borderStyle: "solid",
         borderWidth: 1,
-    },
-
+    }
 });
 
 console.log(styles);
