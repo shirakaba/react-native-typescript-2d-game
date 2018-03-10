@@ -38,6 +38,7 @@ I created a project *with* Expo. This produced the success response:
 > We suggest that you begin by typing:
 > 
 > `cd TheBox`
+>
 > `yarn start`
 
 # Integrating TypeScript
