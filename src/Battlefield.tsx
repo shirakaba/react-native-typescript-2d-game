@@ -11,10 +11,16 @@ interface Props {
     // decrement: () => any
 }
 
-export class Box extends Component<Props, {}> {
+interface State {
+    speed: number,
+    size: number,
+    left: number,
+    top: number
+}
+
+export class Box extends Component<Props, State> {
     render() {
         const combinedStyles: Partial<ViewStyle> = {
-            // ...styles.boxItself,
             backgroundColor: this.props.colour,
             left: this.props.initialLeft,
             top: this.props.initialTop,
@@ -33,7 +39,6 @@ export class Box extends Component<Props, {}> {
 
 export type ComponentStyle = ViewStyle|ImageStyle|TextStyle;
 export interface StyleObject {
-    // [key: string]: Partial<CSSStyleDeclaration>;
     [key: string]: Partial<ComponentStyle>;
 }
 export interface BattlefieldStyleObject extends StyleObject {
