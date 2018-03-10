@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
-import {View, StyleSheet, Text, ViewStyle, TextStyle, ImageStyle, RegisteredStyle} from 'react-native';
+import {
+    View, StyleSheet, Text, ViewStyle, TextStyle, ImageStyle, RegisteredStyle,
+    GestureResponderEvent
+} from 'react-native';
 
 interface Props {
     size: number,
     colour: string,
-    initialLeft: number,
-    initialTop: number,
+    left: number,
+    top: number
+    // onTouchEvent: (left: number, top: number) => void
     // count: number,
     // increment: () => any,
     // decrement: () => any
@@ -14,33 +18,43 @@ interface Props {
 interface State {
     speed: number,
     size: number,
-    left: number,
-    top: number
+    // left: number,
+    // top: number
 }
 
 export class Box extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
+
         this.state = {
             speed: 1,
             size: this.props.size,
-            left: this.props.initialLeft,
-            top: this.props.initialTop
+            // left: this.props.left,
+            // top: this.props.top
         };
     }
+
+    // onTouchEvent(left: number, top: number): void {
+    //     this.setState({
+    //         left: left,
+    //         top: top
+    //     });
+    // }
 
     render() {
         const combinedStyles: Partial<ViewStyle> = {
             backgroundColor: this.props.colour,
-            left: this.props.initialLeft,
-            top: this.props.initialTop,
-            width: this.props.size,
-            height: this.props.size,
+            left: this.props.left,
+            top: this.props.top,
+            width: this.state.size,
+            height: this.state.size,
             position: "absolute"
         };
 
         return (
             <View
+                onStartShouldSetResponder={(ev: GestureResponderEvent) => false}
+                onMoveShouldSetResponder={(ev: GestureResponderEvent) => false}
                 style={[styles.boxItself, combinedStyles]}
             />
         );
