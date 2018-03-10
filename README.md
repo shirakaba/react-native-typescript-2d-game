@@ -99,6 +99,8 @@ Successful building of the app is indicated by a message like "17:40:52: Finishe
 
 # Troubleshooting
 
+Before running `yarn run ios` again (possibly additionally with the `--reset-cache` flag; see below), do the following health check:
+
 * `sudo lsof -i :8081` and `kill -9 <relevant pid>`, as described before.
 
 * Delete the `ios/build` folder.
