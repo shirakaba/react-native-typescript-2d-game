@@ -18,6 +18,7 @@ interface Props {
 interface State {
     speed: number,
     size: number,
+    rotation: number
     // left: number,
     // top: number
 }
@@ -29,6 +30,7 @@ export class Box extends Component<Props, State> {
         this.state = {
             speed: 1,
             size: this.props.size,
+            rotation: 0
             // left: this.props.left,
             // top: this.props.top
         };
@@ -42,13 +44,15 @@ export class Box extends Component<Props, State> {
     // }
 
     render() {
-        const combinedStyles: Partial<ViewStyle> = {
+        const combinedStyles: Partial<ComponentStyle> = {
             backgroundColor: this.props.colour,
             left: this.props.left,
             top: this.props.top,
             width: this.state.size,
             height: this.state.size,
-            position: "absolute"
+            transform: [
+                { rotate: `${this.state.rotation}deg` }
+            ]
         };
 
         return (
@@ -75,5 +79,6 @@ const styles: StyleObject = StyleSheet.create<StyleObject>({
         borderColor: "black",
         borderStyle: "solid",
         borderWidth: 1,
+        position: "absolute"
     }
 });
