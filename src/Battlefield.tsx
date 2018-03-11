@@ -19,7 +19,9 @@ interface BoxPositionStates {
 
 export class Battlefield extends Component<Props, BattlefieldState> {
     private blueBoxSize: number = 50;
+    private redBoxSize: number = 200;
     private blueBoxHalfSize: number = this.blueBoxSize / 2;
+    private redBoxHalfSize: number = this.redBoxSize / 2;
     // private blueBoxHalfSize: number = 0;
 
     constructor(props: Props) {
@@ -55,21 +57,23 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     // 22:52:46: }
 
     onResponderGrant(ev: GestureResponderEvent): void {
-        // console.log(`[onResponderGrant] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
+        console.log(`[onResponderGrant] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
         this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
     onResponderMove(ev: GestureResponderEvent): void {
-        // console.log(`[${name}] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
+        console.log(`[onResponderMove] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
         // this.moveBlueBox(ev.nativeEvent.locationX, ev.nativeEvent.locationY);
         this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
     moveRedBox(left: number, top: number): void {
         this.setState({
             redBoxPosition: {
-                left: left,
-                top: top
+                left: left - this.redBoxHalfSize,
+                top: top - this.redBoxHalfSize
             }
         });
     }
@@ -99,12 +103,14 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 // onResponderTerminate={(ev: GestureResponderEvent) => { console.log(`onResponderTerminate():`, ev.nativeEvent); }}
             >
                 <Box
-                    size={200}
+                    speed={5}
+                    size={this.redBoxSize}
                     colour={"red"}
                     targetLeft={this.state.redBoxPosition.left}
                     targetTop={this.state.redBoxPosition.top}
                 />
                 <Box
+                    speed={10}
                     size={this.blueBoxSize}
                     colour={"blue"}
                     targetLeft={this.state.blueBoxPosition.left}

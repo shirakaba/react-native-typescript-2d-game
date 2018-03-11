@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 
 interface Props {
+    speed: number,
     size: number,
     colour: string,
     targetLeft: number,
@@ -33,7 +34,7 @@ export class Box extends Component<Props, State> {
         // console.log("RECONSTRUCTED");
 
         this.state = {
-            speed: 10,
+            speed: this.props.speed,
             size: this.props.size,
             rotation: 0,
             left: this.props.targetLeft,
@@ -53,6 +54,7 @@ export class Box extends Component<Props, State> {
             nextProps.targetTop.toFixed(1) !== this.state.top.toFixed(1)){
             // this.advance();
             clearInterval(this.timerID);
+            this.advance();
             this.timerID = window.setInterval(
                 () => this.advance(),
                 // this.props.updateFreq || 1000
@@ -81,23 +83,20 @@ export class Box extends Component<Props, State> {
             this.props.targetLeft.toFixed(1) === this.state.left.toFixed(1) &&
             this.props.targetTop.toFixed(1) === this.state.top.toFixed(1)
         ){
-            console.log(`[advance() stopped] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
+            // console.log(`[advance() stopped] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
             clearInterval(this.timerID);
             return;
         }
-        console.log(`[advance()] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
+        // console.log(`[advance()] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
         const xDiff: number = this.props.targetLeft - this.state.left;
         const yDiff: number = this.props.targetTop - this.state.top;
 
         let angle: number = Math.atan2(yDiff, xDiff);
         const maxAdvanceX: number = Math.cos(angle) * this.state.speed;
         const maxAdvanceY: number = Math.sin(angle) * this.state.speed;
-        console.log(`[advance()] angle: ${(angle * (180/3.14159)).toFixed(2)}º; maxAdvanceY: ${maxAdvanceX.toFixed(0)}; maxAdvanceX ${maxAdvanceX.toFixed(0)}`);
+        // console.log(`[advance()] angle: ${(angle * (180/3.14159)).toFixed(2)}º; maxAdvanceY: ${maxAdvanceX.toFixed(0)}; maxAdvanceX ${maxAdvanceX.toFixed(0)}`);
 
         this.setState((prevState: Readonly<State>, props: Props) => {
-
-
-
             return {
                 rotation: prevState.rotation + (angle * 180/3.14159 - prevState.rotation)/4, // Easing!
                 left: (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft)),
