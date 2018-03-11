@@ -48,13 +48,15 @@ export class Box extends Component<Props, State> {
 
     componentWillReceiveProps(nextProps: Props): void {
         // Guard against un-needed renders.
-        if(nextProps.targetLeft !== this.state.left || nextProps.targetTop !== this.state.top){
+        if(
+            nextProps.targetLeft.toFixed(1) !== this.state.left.toFixed(1) ||
+            nextProps.targetTop.toFixed(1) !== this.state.top.toFixed(1)){
             // this.advance();
             clearInterval(this.timerID);
             this.timerID = window.setInterval(
                 () => this.advance(),
                 // this.props.updateFreq || 1000
-                100
+                20
             );
         } else {
             clearInterval(this.timerID);
@@ -75,21 +77,32 @@ export class Box extends Component<Props, State> {
     // }
 
     advance(): void {
-        console.log(`[advance()] targetLeft: ${this.props.targetLeft.toFixed(0)}; targetTop: ${this.props.targetTop.toFixed(0)}; left: ${this.state.left.toFixed(0)}; top: ${this.state.top.toFixed(0)}`);
+        if(
+            this.props.targetLeft.toFixed(1) === this.state.left.toFixed(1) &&
+            this.props.targetTop.toFixed(1) === this.state.top.toFixed(1)
+        ){
+            console.log(`[advance() stopped] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
+            clearInterval(this.timerID);
+            return;
+        }
+        console.log(`[advance()] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
         const xDiff: number = this.props.targetLeft - this.state.left;
         const yDiff: number = this.props.targetTop - this.state.top;
 
-        let angle: number = Math.atan2(yDiff, xDiff);
-        const maxAdvanceX: number = Math.sin(angle + Math.sin(Math.asin(1))) * this.state.speed;
-        const maxAdvanceY: number = Math.sin(angle) * this.state.speed;
+        let angle: number = Math.atan2(Math.abs(yDiff), Math.abs(xDiff));
+        const maxAdvanceX: number = Math.sin(angle + 1) * this.state.speed * (xDiff >= 0 ? 1 : -1);
+        const maxAdvanceY: number = Math.sin(angle /*- 1*/) * this.state.speed * (yDiff >= 0 ? 1 : -1);
         console.log(`[advance()] angle: ${(angle * (180/3.14159)).toFixed(2)}º; maxAdvanceY: ${maxAdvanceX.toFixed(0)}; maxAdvanceX ${maxAdvanceX.toFixed(0)}`);
 
         this.setState((prevState: Readonly<State>, props: Props) => {
 
+
+
             return {
                 rotation: angle,
-                left: Math.min(prevState.left + maxAdvanceX, props.targetLeft),
-                top: Math.min(prevState.top + maxAdvanceY, props.targetTop)
+                left: (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft)),
+                top: (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop)),
+                // top: Math.min(prevState.top + maxAdvanceY, props.targetTop)
             }
         });
 
