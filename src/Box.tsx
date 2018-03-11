@@ -89,9 +89,9 @@ export class Box extends Component<Props, State> {
         const xDiff: number = this.props.targetLeft - this.state.left;
         const yDiff: number = this.props.targetTop - this.state.top;
 
-        let angle: number = Math.atan2(Math.abs(yDiff), Math.abs(xDiff));
-        const maxAdvanceX: number = Math.sin(angle + 1) * this.state.speed * (xDiff >= 0 ? 1 : -1);
-        const maxAdvanceY: number = Math.sin(angle /*- 1*/) * this.state.speed * (yDiff >= 0 ? 1 : -1);
+        let angle: number = Math.atan2(yDiff, xDiff);
+        const maxAdvanceX: number = Math.cos(angle) * this.state.speed;
+        const maxAdvanceY: number = Math.sin(angle) * this.state.speed;
         console.log(`[advance()] angle: ${(angle * (180/3.14159)).toFixed(2)}º; maxAdvanceY: ${maxAdvanceX.toFixed(0)}; maxAdvanceX ${maxAdvanceX.toFixed(0)}`);
 
         this.setState((prevState: Readonly<State>, props: Props) => {
@@ -99,7 +99,7 @@ export class Box extends Component<Props, State> {
 
 
             return {
-                rotation: angle,
+                rotation: prevState.rotation + (angle * 180/3.14159 - prevState.rotation)/4, // Easing!
                 left: (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft)),
                 top: (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop)),
                 // top: Math.min(prevState.top + maxAdvanceY, props.targetTop)
