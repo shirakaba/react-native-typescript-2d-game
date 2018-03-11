@@ -7,9 +7,9 @@ import {
 interface Props {
     size: number,
     colour: string,
-    left: number,
-    top: number
-    // onTouchEvent: (left: number, top: number) => void
+    targetLeft: number,
+    targetTop: number
+    // onTouchEvent: (targetLeft: number, targetTop: number) => void
     // count: number,
     // increment: () => any,
     // decrement: () => any
@@ -18,36 +18,52 @@ interface Props {
 interface State {
     speed: number,
     size: number,
-    rotation: number
-    // left: number,
-    // top: number
+    rotation: number,
+    left: number,
+    top: number
+    // targetLeft: number,
+    // targetTop: number
 }
 
 export class Box extends Component<Props, State> {
+    private maxAdvancePerTick: number = 10;
+
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            speed: 1,
+            speed: 10,
             size: this.props.size,
-            rotation: 0
-            // left: this.props.left,
-            // top: this.props.top
+            rotation: 0,
+            left: this.props.targetLeft,
+            top: this.props.targetTop
         };
     }
 
-    // onTouchEvent(left: number, top: number): void {
-    //     this.setState({
-    //         left: left,
-    //         top: top
-    //     });
+    // rotateToPoint(newLeft: number, newTop: number): void {
+    //     // const leftDiff: number = newLeft - this.state.targetLeft
     // }
+
+    advance(newLeft: number, newTop: number): void {
+        const xDiff: number = newLeft - this.state.left;
+        const yDiff: number = newTop - this.state.top;
+
+        const angle: number = Math.atan2(yDiff, xDiff);
+        const maxAdvanceX: number = Math.sin(angle) * this.state.speed;
+        const maxAdvanceY: number = Math.sin(angle) * this.state.speed;
+
+        this.setState({
+            rotation: angle,
+            left: maxAdvanceX,
+            top: maxAdvanceY
+        });
+    }
 
     render() {
         const combinedStyles: Partial<ComponentStyle> = {
             backgroundColor: this.props.colour,
-            left: this.props.left,
-            top: this.props.top,
+            left: this.state.left,
+            top: this.state.top,
             width: this.state.size,
             height: this.state.size,
             transform: [
@@ -57,8 +73,8 @@ export class Box extends Component<Props, State> {
 
         return (
             <View
-                onStartShouldSetResponder={(ev: GestureResponderEvent) => false}
-                onMoveShouldSetResponder={(ev: GestureResponderEvent) => false}
+                // onStartShouldSetResponder={(ev: GestureResponderEvent) => false}
+                // onMoveShouldSetResponder={(ev: GestureResponderEvent) => false}
                 style={[styles.boxItself, combinedStyles]}
             />
         );

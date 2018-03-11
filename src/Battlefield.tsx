@@ -98,8 +98,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 // onResponderTerminationRequest={(ev: GestureResponderEvent) => true}
                 // onResponderTerminate={(ev: GestureResponderEvent) => { console.log(`onResponderTerminate():`, ev.nativeEvent); }}
             >
-                <Box size={200} colour={"red"} left={this.state.redBoxPosition.left} top={this.state.redBoxPosition.top}/>
-                <Box size={this.blueBoxSize} colour={"blue"} left={this.state.blueBoxPosition.left} top={this.state.blueBoxPosition.top}/>
+                <Box size={200} colour={"red"} targetLeft={this.state.redBoxPosition.left} targetTop={this.state.redBoxPosition.top}/>
+                <Box size={this.blueBoxSize} colour={"blue"} targetLeft={this.state.blueBoxPosition.left} targetTop={this.state.blueBoxPosition.top}/>
             </View>
         );
     }
