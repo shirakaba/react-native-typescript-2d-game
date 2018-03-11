@@ -54,18 +54,13 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     // 22:52:46:   "touches": Array [],
     // 22:52:46: }
 
-    onPress(ev): void {
-        console.log(ev);
-        // Alert.alert('You tapped the screen!');
-    }
-
     onResponderGrant(ev: GestureResponderEvent): void {
         // console.log(`[onResponderGrant] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
         this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
     onResponderMove(ev: GestureResponderEvent): void {
-        // console.log(`[onResponderMove] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
+        // console.log(`[${name}] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
         // this.moveBlueBox(ev.nativeEvent.locationX, ev.nativeEvent.locationY);
         this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
