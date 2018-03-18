@@ -27,12 +27,15 @@ interface State {
     // targetTop: number
 }
 
+export const radToDeg: number = 180/Math.PI;
+
 // @observer
 export class Box extends Component<Props, State> {
     // static propTypes = {
-    //     keys: PropTypes.object,
-    //     onEnterBuilding: PropTypes.func,
-    //     store: PropTypes.object,
+    //     radToDeg: 180/Math.PI // must be a function
+    //     // keys: PropTypes.object,
+    //     // onEnterBuilding: PropTypes.func,
+    //     // store: PropTypes.object,
     // };
 
     static contextTypes = {
@@ -44,7 +47,6 @@ export class Box extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
         // console.log("RECONSTRUCTED");
-        // console.log(this.context.loop);
 
         this.state = {
             speed: this.props.speed,
@@ -57,10 +59,6 @@ export class Box extends Component<Props, State> {
         this.advance = this.advance.bind(this);
         this.hasArrived = this.hasArrived.bind(this);
         this.update = this.update.bind(this); // ABSOLUTELY necessary - update() is getting called from somewhere invisible.
-
-        // setInterval()
-        // this.advance(this.props.targetLeft, this.props.targetTop);
-        // this.update = this.update.bind(this);
     }
 
     hasArrived(): boolean {
@@ -68,24 +66,11 @@ export class Box extends Component<Props, State> {
     }
 
     // componentWillReceiveProps(nextProps: Props): void {
-    //     // Guard against un-needed renders.
-    //     if(this.hasArrived()){
-    //         clearInterval(this.timerID);
-    //     } else {
-    //         // this.advance();
-    //         clearInterval(this.timerID);
-    //         this.advance();
-    //         this.timerID = window.setInterval(
-    //             () => this.advance(),
-    //             // this.props.updateFreq || 1000
-    //             20
-    //         );
-    //     }
     // }
 
     loop = () => {
         //Do stuff here
-        // console.log("LOOP");
+        console.log("LOOP");
     };
 
     // tick logic
@@ -132,7 +117,7 @@ export class Box extends Component<Props, State> {
 
         this.setState((prevState: Readonly<State>, props: Props) => {
             return {
-                rotation: prevState.rotation + (angle * 180/3.14159 - prevState.rotation)/4, // Easing!
+                rotation: prevState.rotation + (angle * radToDeg - prevState.rotation)/4, // Easing!
                 left: (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft)),
                 top: (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop)),
                 // top: Math.min(prevState.top + maxAdvanceY, props.targetTop)
