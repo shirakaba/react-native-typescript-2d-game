@@ -33,8 +33,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 top: 75
             },
             blueBoxPosition: {
-                left: 50,
-                top: 50
+                left: 200,
+                top: 400
             }
         };
     }

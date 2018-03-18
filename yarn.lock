@@ -4197,6 +4197,10 @@ match-require@^2.0.0:
   dependencies:
     uuid "^3.0.0"
 
+matter-js@^0.14.0:
+  version "0.14.1"
+  resolved "https://registry.yarnpkg.com/matter-js/-/matter-js-0.14.1.tgz#71d967f2de858b1616bfccc1002ab38aab9e350a"
+
 md5-file@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/md5-file/-/md5-file-3.2.3.tgz#f9bceb941eca2214a4c0727f5e700314e770f06f"
@@ -5217,6 +5221,12 @@ react-devtools-core@3.0.0:
   dependencies:
     shell-quote "^1.6.1"
     ws "^2.0.3"
+
+react-game-kit@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/react-game-kit/-/react-game-kit-1.0.6.tgz#fa12c847fe00982000a496b726fd6fdaca95d3ec"
+  dependencies:
+    matter-js "^0.14.0"
 
 react-native-branch@2.0.0-beta.3:
   version "2.0.0-beta.3"
