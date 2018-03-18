@@ -110,11 +110,13 @@ export class Box extends Component<Props, State> {
             backgroundColor: this.props.colour,
             // left: this.props.targetLeft,
             // top: this.props.targetTop,
-            left: this.state.left,
-            top: this.state.top,
+            // left: this.state.left,
+            // top: this.state.top,
             width: this.state.size,
             height: this.state.size,
             transform: [
+                { translateX: this.state.left },
+                { translateY: this.state.top },
                 { rotate: `${this.state.rotation}deg` }
             ]
         };
