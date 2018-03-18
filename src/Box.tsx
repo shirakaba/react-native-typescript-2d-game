@@ -3,6 +3,7 @@ import {
     View, StyleSheet, Text, ViewStyle, TextStyle, ImageStyle, RegisteredStyle,
     GestureResponderEvent
 } from 'react-native';
+import PropTypes from 'prop-types';
 
 interface Props {
     speed: number,
@@ -26,12 +27,24 @@ interface State {
     // targetTop: number
 }
 
+// @observer
 export class Box extends Component<Props, State> {
+    // static propTypes = {
+    //     keys: PropTypes.object,
+    //     onEnterBuilding: PropTypes.func,
+    //     store: PropTypes.object,
+    // };
+
+    static contextTypes = {
+        loop: PropTypes.object,
+    };
+
     private timerID: number;
 
     constructor(props: Props) {
         super(props);
         // console.log("RECONSTRUCTED");
+        // console.log(this.context.loop);
 
         this.state = {
             speed: this.props.speed,
@@ -42,36 +55,57 @@ export class Box extends Component<Props, State> {
         };
 
         this.advance = this.advance.bind(this);
+        this.hasArrived = this.hasArrived.bind(this);
+        this.update = this.update.bind(this); // ABSOLUTELY necessary - update() is getting called from somewhere invisible.
 
         // setInterval()
         // this.advance(this.props.targetLeft, this.props.targetTop);
+        // this.update = this.update.bind(this);
     }
 
-    componentWillReceiveProps(nextProps: Props): void {
-        // Guard against un-needed renders.
-        if(
-            nextProps.targetLeft.toFixed(1) !== this.state.left.toFixed(1) ||
-            nextProps.targetTop.toFixed(1) !== this.state.top.toFixed(1)){
-            // this.advance();
-            clearInterval(this.timerID);
-            this.advance();
-            this.timerID = window.setInterval(
-                () => this.advance(),
-                // this.props.updateFreq || 1000
-                20
-            );
-        } else {
-            clearInterval(this.timerID);
-        }
+    hasArrived(): boolean {
+        return Math.abs(this.props.targetLeft - this.state.left) < 0.00001 && Math.abs(this.props.targetTop - this.state.top) < 0.00001;
     }
+
+    // componentWillReceiveProps(nextProps: Props): void {
+    //     // Guard against un-needed renders.
+    //     if(this.hasArrived()){
+    //         clearInterval(this.timerID);
+    //     } else {
+    //         // this.advance();
+    //         clearInterval(this.timerID);
+    //         this.advance();
+    //         this.timerID = window.setInterval(
+    //             () => this.advance(),
+    //             // this.props.updateFreq || 1000
+    //             20
+    //         );
+    //     }
+    // }
+
+    loop = () => {
+        //Do stuff here
+        // console.log("LOOP");
+    };
+
+    // tick logic
+    update() {
+        // console.log("this.state", this.state);
+        // console.log("BOX UPDATE");
+        if(!this.hasArrived()){
+            this.advance();
+        }
+    };
 
     componentDidMount(): void {
-        if(this.props.colour !== "red") {
-        }
+        this.context.loop.subscribe(this.update); // Not actually a promise!
+        // if(this.props.colour !== "red") {
+        // }
     }
 
     componentWillUnmount(): void {
-        clearInterval(this.timerID);
+        this.context.loop.unsubscribe(this.update); // Not actually a promise!
+        // clearInterval(this.timerID);
     }
 
     // rotateToPoint(newLeft: number, newTop: number): void {
