@@ -21,6 +21,7 @@ interface State {
     speed: number,
     size: number,
     rotation: number,
+    hasDefinitelyArrived: boolean,
     left: number,
     top: number
     // targetLeft: number,
@@ -49,29 +50,42 @@ export class Box extends Component<Props, State> {
             speed: this.props.speed,
             size: this.props.size,
             rotation: 0,
+            hasDefinitelyArrived: true,
             left: this.props.targetLeft,
             top: this.props.targetTop
         };
 
         this.advance = this.advance.bind(this);
+        this.hasArrivedAtCoord = this.hasArrivedAtCoord.bind(this);
         this.hasArrived = this.hasArrived.bind(this);
         this.update = this.update.bind(this); // ABSOLUTELY necessary - update() is getting called from somewhere invisible.
     }
 
-    hasArrived(): boolean {
-        return Math.abs(this.props.targetLeft - this.state.left) < 0.00001 && Math.abs(this.props.targetTop - this.state.top) < 0.00001;
+    hasArrivedAtCoord(target: number, current: number): boolean {
+        return Math.abs(target - current) < 0.00001;
     }
 
-    // componentWillReceiveProps(nextProps: Props): void {
-    // }
+    hasArrived(): boolean {
+        return this.hasArrivedAtCoord(this.props.targetLeft, this.state.left) && this.hasArrivedAtCoord(this.props.targetTop, this.state.top);
+    }
+
+    componentWillReceiveProps(nextProps: Props): void {
+        this.setState({
+            hasDefinitelyArrived: this.hasArrivedAtCoord(nextProps.targetTop, this.state.top) && this.hasArrivedAtCoord(nextProps.targetLeft, this.state.left)
+        });
+    }
 
     // instead of loop()
     update() {
-        // console.log("this.state", this.state);
-        // console.log("BOX UPDATE");
-        if(!this.hasArrived()){
+        if(this.state.hasDefinitelyArrived){
+            return;
+        } else {
             this.advance();
         }
+        // console.log("this.state", this.state);
+        // console.log("BOX UPDATE");
+        // if(!this.hasArrived()){
+        // }
     };
 
     componentDidMount(): void {
@@ -85,7 +99,7 @@ export class Box extends Component<Props, State> {
     }
 
     advance(): void {
-        if(this.hasArrived()) return;
+        // if(this.hasArrived()) return;
 
         // console.log(`[advance()] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
         const xDiff: number = this.props.targetLeft - this.state.left;
@@ -97,10 +111,13 @@ export class Box extends Component<Props, State> {
         // console.log(`[advance()] angle: ${(angle * (180/3.14159)).toFixed(2)}º; maxAdvanceY: ${maxAdvanceX.toFixed(0)}; maxAdvanceX ${maxAdvanceX.toFixed(0)}`);
 
         this.setState((prevState: Readonly<State>, props: Props) => {
+            const left: number = (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft));
+            const top: number = (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop));
             return {
                 rotation: prevState.rotation + (angle * radToDeg - prevState.rotation)/4, // Easing!
-                left: (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft)),
-                top: (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop))
+                left: left,
+                top: top,
+                hasDefinitelyArrived: this.hasArrivedAtCoord(props.targetLeft, left) && this.hasArrivedAtCoord(props.targetTop, top)
             }
         });
     }
