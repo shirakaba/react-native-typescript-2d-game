@@ -29,7 +29,6 @@ interface State {
 
 export const radToDeg: number = 180/Math.PI;
 
-// @observer
 export class Box extends Component<Props, State> {
     // static propTypes = {
     //     radToDeg: 180/Math.PI // must be a function
@@ -41,8 +40,6 @@ export class Box extends Component<Props, State> {
     static contextTypes = {
         loop: PropTypes.object,
     };
-
-    private timerID: number;
 
     constructor(props: Props) {
         super(props);
@@ -88,19 +85,13 @@ export class Box extends Component<Props, State> {
     }
 
     advance(): void {
-        if(
-            this.props.targetLeft.toFixed(1) === this.state.left.toFixed(1) &&
-            this.props.targetTop.toFixed(1) === this.state.top.toFixed(1)
-        ){
-            // console.log(`[advance() stopped] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
-            clearInterval(this.timerID);
-            return;
-        }
+        if(this.hasArrived()) return;
+
         // console.log(`[advance()] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
         const xDiff: number = this.props.targetLeft - this.state.left;
         const yDiff: number = this.props.targetTop - this.state.top;
 
-        let angle: number = Math.atan2(yDiff, xDiff);
+        const angle: number = Math.atan2(yDiff, xDiff);
         const maxAdvanceX: number = Math.cos(angle) * this.state.speed;
         const maxAdvanceY: number = Math.sin(angle) * this.state.speed;
         // console.log(`[advance()] angle: ${(angle * (180/3.14159)).toFixed(2)}º; maxAdvanceY: ${maxAdvanceX.toFixed(0)}; maxAdvanceX ${maxAdvanceX.toFixed(0)}`);
