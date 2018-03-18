@@ -1,7 +1,7 @@
 import React from 'react';
 import {Alert, GestureResponderEvent, StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
 import {Box} from "./src/Box";
-import {Battlefield} from "./src/Battlefield";
+import {Battlefield} from "./src/GameLoop";
 
 export default class App extends React.Component {
 
