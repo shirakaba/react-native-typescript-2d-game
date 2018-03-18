@@ -68,12 +68,7 @@ export class Box extends Component<Props, State> {
     // componentWillReceiveProps(nextProps: Props): void {
     // }
 
-    loop = () => {
-        //Do stuff here
-        console.log("LOOP");
-    };
-
-    // tick logic
+    // instead of loop()
     update() {
         // console.log("this.state", this.state);
         // console.log("BOX UPDATE");
@@ -90,12 +85,7 @@ export class Box extends Component<Props, State> {
 
     componentWillUnmount(): void {
         this.context.loop.unsubscribe(this.update); // Not actually a promise!
-        // clearInterval(this.timerID);
     }
-
-    // rotateToPoint(newLeft: number, newTop: number): void {
-    //     // const leftDiff: number = newLeft - this.state.targetLeft
-    // }
 
     advance(): void {
         if(
@@ -119,16 +109,9 @@ export class Box extends Component<Props, State> {
             return {
                 rotation: prevState.rotation + (angle * radToDeg - prevState.rotation)/4, // Easing!
                 left: (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft)),
-                top: (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop)),
-                // top: Math.min(prevState.top + maxAdvanceY, props.targetTop)
+                top: (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop))
             }
         });
-
-        // this.setState({
-        //     rotation: angle,
-        //     left: maxAdvanceX,
-        //     top: maxAdvanceY
-        // });
     }
 
     render() {
