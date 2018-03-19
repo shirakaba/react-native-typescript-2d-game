@@ -7,27 +7,35 @@ import PropTypes from 'prop-types';
 interface Props {
 }
 
-type BattlefieldState = BoxPositionStates;
+type BattlefieldState = BoxPositionStates & CollisionState;
 
-interface BoxPositionState {
+interface CollisionState {
+    colliding: boolean
+}
+
+interface BoxPositionState extends BoxTargetState {
+    rotation: number
+}
+
+interface BoxTargetState {
     left: number,
-    top: number,
-    rotation?: number
+    top: number
 }
 
 interface BoxPositionStates {
     redBoxPosition: BoxPositionState,
-    redBoxTarget: BoxPositionState,
+    redBoxTarget: BoxTargetState,
     blueBoxPosition: BoxPositionState
-    blueBoxTarget: BoxPositionState
+    blueBoxTarget: BoxTargetState
 }
 
 export class Battlefield extends Component<Props, BattlefieldState> {
     private blueBoxSize: number = 50;
     private redBoxSize: number = 200;
-    private blueBoxHalfSize: number = this.blueBoxSize / 2;
-    private redBoxHalfSize: number = this.redBoxSize / 2;
-    // private blueBoxHalfSize: number = 0;
+    // private blueBoxHalfSize: number = this.blueBoxSize / 2;
+    // private redBoxHalfSize: number = this.redBoxSize / 2;
+    private blueBoxHalfSize: number = 0;
+    private redBoxHalfSize: number = 0;
 
     static contextTypes = {
         loop: PropTypes.object,
@@ -35,32 +43,79 @@ export class Battlefield extends Component<Props, BattlefieldState> {
 
     constructor(props: Props) {
         super(props);
+        const redInitialLeft: number = 90;
+        const redInitialTop: number = 75;
+        const blueInitialLeft: number = 200;
+        const blueInitialTop: number = 400;
 
         this.state = {
+            colliding: false,
             redBoxPosition: {
-                left: 90,
-                top: 75
+                left: redInitialLeft,
+                top: redInitialTop,
+                rotation: 0
             },
             redBoxTarget: {
-                left: 90,
-                top: 75
+                left: redInitialLeft,
+                top: redInitialTop
             },
             blueBoxPosition: {
-                left: 200,
-                top: 400
+                left: blueInitialLeft,
+                top: blueInitialTop,
+                rotation: 0
             },
             blueBoxTarget: {
-                left: 200,
-                top: 400
+                left: blueInitialLeft,
+                top: blueInitialTop
             }
         };
 
+        this.update = this.update.bind(this);
     }
 
     // instead of loop()
     update() {
-
+        if(this.checkCollisions(this.state.blueBoxPosition, this.state.redBoxPosition)){
+            if(!this.state.colliding){
+                this.setState({
+                    colliding: true
+                });
+            }
+        } else {
+            if(this.state.colliding){
+                this.setState({
+                    colliding: false
+                });
+            }
+        }
     };
+
+    checkCollisions(blue: BoxPositionState, red: BoxPositionState): boolean {
+        const blueRight: number = blue.left + this.blueBoxSize;
+        const blueBottom: number = blue.top + this.blueBoxSize;
+        const redRight: number = red.left + this.redBoxSize;
+        const redBottom: number = red.top + this.redBoxSize;
+        if(
+            blueRight > red.left && blueRight < redRight || // blue's right edge is in bounds
+            blue.left > red.left && blue.left < redRight // blue's right edge is in bounds
+        ){
+            if(
+                blue.top > red.top && blue.top < redBottom || // blue's top edge is in bounds
+                blueBottom < redBottom && blueBottom > red.top // blue's bottom edge is in bounds
+            ){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    componentDidMount(): void {
+        this.context.loop.subscribe(this.update);
+    }
+
+    componentWillUnmount(): void {
+        this.context.loop.unsubscribe(this.update);
+    }
 
     onResponderGrant(ev: GestureResponderEvent): void {
         // console.log(`[onResponderGrant] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
@@ -122,7 +177,6 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     }
 
     moveBlueBox(left: number, top: number): void {
-        // console.log(`moveBlueBox()...`);
         this.setState({
             blueBoxTarget: {
                 left: left - this.blueBoxHalfSize,
@@ -146,24 +200,24 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     // onResponderTerminationRequest={(ev: GestureResponderEvent) => true}
                     // onResponderTerminate={(ev: GestureResponderEvent) => { console.log(`onResponderTerminate():`, ev.nativeEvent); }}
                 >
-                <Box
-                    id={"red"}
-                    speed={5}
-                    size={this.redBoxSize}
-                    colour={"red"}
-                    targetLeft={this.state.redBoxTarget.left}
-                    targetTop={this.state.redBoxTarget.top}
-                    onPositionUpdate={this.onPositionUpdate.bind(this)}
-                />
-                <Box
-                    id={"blue"}
-                    speed={10}
-                    size={this.blueBoxSize}
-                    colour={"blue"}
-                    targetLeft={this.state.blueBoxTarget.left}
-                    targetTop={this.state.blueBoxTarget.top}
-                    onPositionUpdate={this.onPositionUpdate.bind(this)}
-                />
+                    <Box
+                        id={"red"}
+                        speed={5}
+                        size={this.redBoxSize}
+                        colour={"red"}
+                        targetLeft={this.state.redBoxTarget.left}
+                        targetTop={this.state.redBoxTarget.top}
+                        onPositionUpdate={this.onPositionUpdate.bind(this)}
+                    />
+                    <Box
+                        id={"blue"}
+                        speed={10}
+                        size={this.blueBoxSize}
+                        colour={"blue"}
+                        targetLeft={this.state.blueBoxTarget.left}
+                        targetTop={this.state.blueBoxTarget.top}
+                        onPositionUpdate={this.onPositionUpdate.bind(this)}
+                    />
             </View>
         </Loop>
     );
