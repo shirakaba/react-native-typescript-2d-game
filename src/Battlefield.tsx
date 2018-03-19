@@ -32,10 +32,10 @@ interface BoxPositionStates {
 export class Battlefield extends Component<Props, BattlefieldState> {
     private blueBoxSize: number = 50;
     private redBoxSize: number = 200;
-    // private blueBoxHalfSize: number = this.blueBoxSize / 2;
-    // private redBoxHalfSize: number = this.redBoxSize / 2;
-    private blueBoxHalfSize: number = 0;
-    private redBoxHalfSize: number = 0;
+    private blueBoxHalfSize: number = this.blueBoxSize / 2;
+    private redBoxHalfSize: number = this.redBoxSize / 2;
+    // private blueBoxHalfSize: number = 0;
+    // private redBoxHalfSize: number = 0;
 
     static contextTypes = {
         loop: PropTypes.object,
@@ -120,16 +120,17 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     onResponderGrant(ev: GestureResponderEvent): void {
         // console.log(`[onResponderGrant] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
         this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
-        this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        // this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
     onResponderMove(ev: GestureResponderEvent): void {
         // console.log(`[onResponderMove] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
         // this.moveBlueBox(ev.nativeEvent.locationX, ev.nativeEvent.locationY);
         this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
-        this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        // this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
+    // TODO: ideally queue the two setState calls, as we know both WILL be updating each frame.
     onPositionUpdate(id: string, left: number, top: number, rotation: number): void {
         switch(id){
             case "red":
@@ -167,14 +168,16 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     //     return true;
     // }
 
-    moveRedBox(left: number, top: number): void {
-        this.setState({
-            redBoxTarget: {
-                left: left - this.redBoxHalfSize,
-                top: top - this.redBoxHalfSize
-            }
-        });
-    }
+    // moveRedBox(left: number, top: number): void {
+    //     this.setState({
+    //         redBoxTarget: {
+    //             left: left - this.redBoxHalfSize,
+    //             top: top - this.redBoxHalfSize
+    //             // left: this.state.blueBoxPosition.left,
+    //             // top: this.state.blueBoxPosition.top
+    //         }
+    //     });
+    // }
 
     moveBlueBox(left: number, top: number): void {
         this.setState({
@@ -200,13 +203,16 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     // onResponderTerminationRequest={(ev: GestureResponderEvent) => true}
                     // onResponderTerminate={(ev: GestureResponderEvent) => { console.log(`onResponderTerminate():`, ev.nativeEvent); }}
                 >
+                    <Text style={styles.textbox}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     <Box
                         id={"red"}
                         speed={5}
                         size={this.redBoxSize}
                         colour={"red"}
-                        targetLeft={this.state.redBoxTarget.left}
-                        targetTop={this.state.redBoxTarget.top}
+                        // targetLeft={this.state.redBoxTarget.left}
+                        // targetTop={this.state.redBoxTarget.top}
+                        targetLeft={this.state.blueBoxPosition.left + this.blueBoxHalfSize - this.redBoxHalfSize}
+                        targetTop={this.state.blueBoxPosition.top + this.blueBoxHalfSize - this.redBoxHalfSize}
                         onPositionUpdate={this.onPositionUpdate.bind(this)}
                     />
                     <Box
@@ -234,6 +240,11 @@ const styles = StyleSheet.create({
         // alignItems: 'center',
         // justifyContent: 'center',
     },
-    fullscreen: {
+    textbox: {
+        position: 'absolute',
+        left: 150,
+        top: 50,
+        fontSize: 20,
+        fontWeight: 'bold'
     }
 });
