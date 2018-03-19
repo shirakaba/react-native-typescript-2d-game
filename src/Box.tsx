@@ -6,11 +6,13 @@ import {
 import PropTypes from 'prop-types';
 
 interface Props {
+    id: string,
     speed: number,
     size: number,
     colour: string,
     targetLeft: number,
-    targetTop: number
+    targetTop: number,
+    onPositionUpdate: (id: string, left: number, top: number, rotation: number) => void
     // onTouchEvent: (targetLeft: number, targetTop: number) => void
     // count: number,
     // increment: () => any,
@@ -75,6 +77,9 @@ export class Box extends Component<Props, State> {
         });
     }
 
+    // componentWillUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): void {
+    // }
+
     // instead of loop()
     update() {
         if(this.state.hasDefinitelyArrived){
@@ -113,8 +118,13 @@ export class Box extends Component<Props, State> {
         this.setState((prevState: Readonly<State>, props: Props) => {
             const left: number = (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft));
             const top: number = (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop));
+            const rotation: number = prevState.rotation + (angle * radToDeg - prevState.rotation)/4; // Easing!
+
+            // Unclear whether this should be before setState() call (now) or after (during componentWillUpdate() call).
+            this.props.onPositionUpdate(this.props.id, left, top, rotation);
+
             return {
-                rotation: prevState.rotation + (angle * radToDeg - prevState.rotation)/4, // Easing!
+                rotation: rotation,
                 left: left,
                 top: top,
                 hasDefinitelyArrived: this.hasArrivedAtCoord(props.targetLeft, left) && this.hasArrivedAtCoord(props.targetTop, top)

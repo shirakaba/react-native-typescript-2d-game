@@ -11,12 +11,15 @@ type BattlefieldState = BoxPositionStates;
 
 interface BoxPositionState {
     left: number,
-    top: number
+    top: number,
+    rotation?: number
 }
 
 interface BoxPositionStates {
     redBoxPosition: BoxPositionState,
+    redBoxTarget: BoxPositionState,
     blueBoxPosition: BoxPositionState
+    blueBoxTarget: BoxPositionState
 }
 
 export class Battlefield extends Component<Props, BattlefieldState> {
@@ -38,13 +41,20 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 left: 90,
                 top: 75
             },
+            redBoxTarget: {
+                left: 90,
+                top: 75
+            },
             blueBoxPosition: {
+                left: 200,
+                top: 400
+            },
+            blueBoxTarget: {
                 left: 200,
                 top: 400
             }
         };
 
-        // console.log(this.context);
     }
 
     // instead of loop()
@@ -65,9 +75,46 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
+    onPositionUpdate(id: string, left: number, top: number, rotation: number): void {
+        switch(id){
+            case "red":
+                this.setState({
+                    redBoxPosition: {
+                        left,
+                        top,
+                        rotation
+                    }
+                });
+                break;
+            case "blue":
+                this.setState({
+                    blueBoxPosition: {
+                        left,
+                        top,
+                        rotation
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+    }
+
+    // shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<BattlefieldState>, nextContext: any): boolean {
+    //     // console.log(`this.state.redBoxPosition is ${JSON.stringify(this.state.redBoxPosition, null,3)}\n nextState.redBoxPosition is ${JSON.stringify(nextState.redBoxPosition, null, 3)}`);
+    //     if(this.state.redBoxPosition === nextState.redBoxPosition && this.state.blueBoxPosition === nextState.blueBoxPosition){
+    //         if(this.props === nextProps){
+    //             console.log("both positions shallow-equal, as do the nextProps!");
+    //         }
+    //     } else {
+    //         console.log("Both positions don't shallow-equal!");
+    //     }
+    //     return true;
+    // }
+
     moveRedBox(left: number, top: number): void {
         this.setState({
-            redBoxPosition: {
+            redBoxTarget: {
                 left: left - this.redBoxHalfSize,
                 top: top - this.redBoxHalfSize
             }
@@ -77,7 +124,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     moveBlueBox(left: number, top: number): void {
         // console.log(`moveBlueBox()...`);
         this.setState({
-            blueBoxPosition: {
+            blueBoxTarget: {
                 left: left - this.blueBoxHalfSize,
                 top: top - this.blueBoxHalfSize
             }
@@ -100,18 +147,22 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     // onResponderTerminate={(ev: GestureResponderEvent) => { console.log(`onResponderTerminate():`, ev.nativeEvent); }}
                 >
                 <Box
+                    id={"red"}
                     speed={5}
                     size={this.redBoxSize}
                     colour={"red"}
-                    targetLeft={this.state.redBoxPosition.left}
-                    targetTop={this.state.redBoxPosition.top}
+                    targetLeft={this.state.redBoxTarget.left}
+                    targetTop={this.state.redBoxTarget.top}
+                    onPositionUpdate={this.onPositionUpdate.bind(this)}
                 />
                 <Box
+                    id={"blue"}
                     speed={10}
                     size={this.blueBoxSize}
                     colour={"blue"}
-                    targetLeft={this.state.blueBoxPosition.left}
-                    targetTop={this.state.blueBoxPosition.top}
+                    targetLeft={this.state.blueBoxTarget.left}
+                    targetTop={this.state.blueBoxTarget.top}
+                    onPositionUpdate={this.onPositionUpdate.bind(this)}
                 />
             </View>
         </Loop>
