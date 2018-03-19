@@ -24,7 +24,7 @@ interface BoxTargetState {
 
 interface BoxPositionStates {
     redBoxPosition: BoxPositionState,
-    redBoxTarget: BoxTargetState,
+    // redBoxTarget: BoxTargetState,
     blueBoxPosition: BoxPositionState
     blueBoxTarget: BoxTargetState
 }
@@ -56,10 +56,10 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 top: redInitialTop,
                 rotation: 0
             },
-            redBoxTarget: {
-                left: redInitialLeft,
-                top: redInitialTop
-            },
+            // redBoxTarget: {
+            //     left: redInitialLeft,
+            //     top: redInitialTop
+            // },
             blueBoxPosition: {
                 left: blueInitialLeft,
                 top: blueInitialTop,
