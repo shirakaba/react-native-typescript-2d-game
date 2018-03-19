@@ -129,10 +129,13 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         // this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
+    // Less frequent than screen update.
     onResponderMove(ev: GestureResponderEvent): void {
         // console.log(`[onResponderMove] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
         // this.moveBlueBox(ev.nativeEvent.locationX, ev.nativeEvent.locationY);
-        this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        // console.log(`[onResponderMove] ${this.frameNo}`);
+        // if(this.frameNo % 2 === 0)
+            this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
         // this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
@@ -150,7 +153,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 // By collision-checking inside onPositionUpdate(), we're still invoking it at the screen refresh rate
                 // (the rate at which this.advance() is called), but at least only when there's a change in box position.
                 // console.log(`[${this.frameNo}] RED`);
-                // this.updateCollisionStatus();
+                this.updateCollisionStatus();
                 break;
             case "blue":
                 this.setState({
@@ -168,13 +171,52 @@ export class Battlefield extends Component<Props, BattlefieldState> {
 
     // shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<BattlefieldState>, nextContext: any): boolean {
     //     // console.log(`this.state.redBoxPosition is ${JSON.stringify(this.state.redBoxPosition, null,3)}\n nextState.redBoxPosition is ${JSON.stringify(nextState.redBoxPosition, null, 3)}`);
-    //     if(this.state.redBoxPosition === nextState.redBoxPosition && this.state.blueBoxPosition === nextState.blueBoxPosition){
-    //         if(this.props === nextProps){
-    //             console.log("both positions shallow-equal, as do the nextProps!");
-    //         }
+    //
+    //     // Battlefield doesn't currently receive any props any time.
+    //     // if(nextProps !== this.props){
+    //     //     console.log(nextProps);
+    //     // }
+    //
+    //     if(this.state === nextState){
+    //         // Never comes up, in practice.
+    //         // console.log("Same state (shallow).");
     //     } else {
-    //         console.log("Both positions don't shallow-equal!");
+    //         // console.log("State differed (shallow).");
+    //         if(this.state.redBoxPosition === nextState.redBoxPosition){
+    //             if(this.state.redBoxTarget === nextState.redBoxTarget){
+    //                 // console.log("redBoxPosition same (shallow), as well as its target (shallow)");
+    //                 // Can't return false here.
+    //                 if(this.state.blueBoxPosition === nextState.blueBoxPosition){
+    //                     // console.log("redBoxPosition same (shallow), as well as its target (shallow), and blueBoxPosition (shallow).");
+    //                     // Can't return false here.
+    //                     if(this.state.blueBoxTarget === nextState.blueBoxTarget){
+    //                         // Doesn't happen in practice.
+    //                         // console.log("redBoxPosition same (shallow), as well as its target (shallow), and blueBoxPosition (shallow) as well as its target (shallow).");
+    //                     } else {
+    //                         // console.log("redBoxPosition same (shallow), as well as its target (shallow), and blueBoxPosition (shallow) but not its target (shallow).");
+    //                         // Can't return false here.
+    //                     }
+    //                 } else {
+    //                     // console.log("redBoxPosition same (shallow), as well as its target (shallow), but not blueBoxPosition (shallow).");
+    //                     // Can't return false here.
+    //                     if(this.state.blueBoxTarget === nextState.blueBoxTarget){
+    //                         console.log("redBoxPosition same (shallow), as well as its target (shallow), but not blueBoxPosition (shallow) but still its target (shallow).");
+    //                         // Can't return false here.
+    //                     } else {
+    //                         // Doesn't happen in practice.
+    //                         console.log("redBoxPosition same (shallow), as well as its target (shallow), but not blueBoxPosition (shallow) nor its target (shallow).");
+    //                     }
+    //                 }
+    //             } else {
+    //                 // Never comes up in practice.
+    //                 // console.log("redBoxPosition same (shallow), but not its target");
+    //             }
+    //         } else {
+    //             // console.log("redBoxPosition differed (shallow)");
+    //
+    //         }
     //     }
+    //
     //     return true;
     // }
 
