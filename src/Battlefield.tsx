@@ -30,6 +30,7 @@ interface BoxPositionStates {
 }
 
 export class Battlefield extends Component<Props, BattlefieldState> {
+    private frameNo: number = 0;
     private blueBoxSize: number = 50;
     private redBoxSize: number = 200;
     private blueBoxHalfSize: number = this.blueBoxSize / 2;
@@ -75,7 +76,12 @@ export class Battlefield extends Component<Props, BattlefieldState> {
 
     // instead of loop()
     update() {
-        if(this.checkCollisions(this.state.blueBoxPosition, this.state.redBoxPosition)){
+        this.frameNo++;
+        // console.log(this.frameNo);
+    };
+
+    updateCollisionStatus(): void {
+        if(this.isColliding(this.state.blueBoxPosition, this.state.redBoxPosition)){
             if(!this.state.colliding){
                 this.setState({
                     colliding: true
@@ -88,16 +94,16 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 });
             }
         }
-    };
+    }
 
-    checkCollisions(blue: BoxPositionState, red: BoxPositionState): boolean {
+    isColliding(blue: BoxPositionState, red: BoxPositionState): boolean {
         const blueRight: number = blue.left + this.blueBoxSize;
         const blueBottom: number = blue.top + this.blueBoxSize;
         const redRight: number = red.left + this.redBoxSize;
         const redBottom: number = red.top + this.redBoxSize;
         if(
             blueRight > red.left && blueRight < redRight || // blue's right edge is in bounds
-            blue.left > red.left && blue.left < redRight // blue's right edge is in bounds
+            blue.left > red.left && blue.left < redRight // blue's left edge is in bounds
         ){
             if(
                 blue.top > red.top && blue.top < redBottom || // blue's top edge is in bounds
@@ -141,6 +147,10 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                         rotation
                     }
                 });
+                // By collision-checking inside onPositionUpdate(), we're still invoking it at the screen refresh rate
+                // (the rate at which this.advance() is called), but at least only when there's a change in box position.
+                // console.log(`[${this.frameNo}] RED`);
+                // this.updateCollisionStatus();
                 break;
             case "blue":
                 this.setState({
