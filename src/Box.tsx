@@ -33,6 +33,7 @@ interface State {
 export const radToDeg: number = 180/Math.PI;
 
 export class Box extends Component<Props, State> {
+    private date: number = Date.now();
     // static propTypes = {
     //     radToDeg: 180/Math.PI // must be a function
     //     // keys: PropTypes.object,
@@ -82,10 +83,12 @@ export class Box extends Component<Props, State> {
 
     // instead of loop()
     update() {
+        // this.date = Date.now();
         if(this.state.hasDefinitelyArrived){
+            this.date = Date.now();
             return;
         } else {
-            this.advance();
+            this.advance(Date.now());
         }
         // console.log("this.state", this.state);
         // console.log("BOX UPDATE");
@@ -103,7 +106,10 @@ export class Box extends Component<Props, State> {
         this.context.loop.unsubscribe(this.update); // Not actually a promise!
     }
 
-    advance(): void {
+    advance(date: number): void {
+        const dateDiff: number = date - this.date;
+        this.date = date;
+
         // if(this.hasArrived()) return;
 
         // console.log(`[advance()] targetLeft: ${this.props.targetLeft.toFixed(1)}; targetTop: ${this.props.targetTop.toFixed(1)}; left: ${this.state.left.toFixed(1)}; top: ${this.state.top.toFixed(1)}`);
@@ -111,8 +117,8 @@ export class Box extends Component<Props, State> {
         const yDiff: number = this.props.targetTop - this.state.top;
 
         const angle: number = Math.atan2(yDiff, xDiff);
-        const maxAdvanceX: number = Math.cos(angle) * this.state.speed;
-        const maxAdvanceY: number = Math.sin(angle) * this.state.speed;
+        const maxAdvanceX: number = Math.cos(angle) * (this.state.speed * dateDiff);
+        const maxAdvanceY: number = Math.sin(angle) * (this.state.speed * dateDiff);
         // console.log(`[advance()] angle: ${(angle * (180/3.14159)).toFixed(2)}º; maxAdvanceY: ${maxAdvanceX.toFixed(0)}; maxAdvanceX ${maxAdvanceX.toFixed(0)}`);
 
         this.setState((prevState: Readonly<State>, props: Props) => {
@@ -130,6 +136,22 @@ export class Box extends Component<Props, State> {
                 hasDefinitelyArrived: this.hasArrivedAtCoord(props.targetLeft, left) && this.hasArrivedAtCoord(props.targetTop, top)
             }
         });
+    }
+
+    shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
+        if(this.state.top === nextState.top && this.state.left === nextState.left){
+            // if(this.state !== nextState) console.log("top & left same, but no shallow equals.");
+            if(this.props === nextProps){
+                // console.log("top and left of current/next states equal, as well as props!");
+                return false;
+            } else {
+                // console.log("top and left of current/next states equal, yet props differed");
+                return false;
+            }
+        } else {
+            // console.log("top and left of current/next states differ");
+        }
+        return true;
     }
 
     render() {

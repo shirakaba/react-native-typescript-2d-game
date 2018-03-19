@@ -241,6 +241,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     }
 
     render() {
+        const framerate: number = 60;
         return (
             <Loop>
                 <View
@@ -258,7 +259,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     <Text style={styles.textbox}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     <Box
                         id={"red"}
-                        speed={5}
+                        speed={5 / (1000 / framerate)}
                         size={this.redBoxSize}
                         colour={"red"}
                         // targetLeft={this.state.redBoxTarget.left}
@@ -269,7 +270,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     />
                     <Box
                         id={"blue"}
-                        speed={10}
+                        speed={10 / (1000 / framerate)}
                         size={this.blueBoxSize}
                         colour={"blue"}
                         targetLeft={this.state.blueBoxTarget.left}
