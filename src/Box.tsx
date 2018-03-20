@@ -124,13 +124,51 @@ export class Box extends Component<Props, State> {
         this.setState((prevState: Readonly<State>, props: Props) => {
             const left: number = (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft));
             const top: number = (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop));
-            const rotation: number = prevState.rotation + (angle * radToDeg - prevState.rotation)/4; // Easing!
+            const extraRotation: number = (angle * radToDeg - prevState.rotation) % 360; // Easing!
+            const easing: number = 4;
+            // if(this.props.id === "red"){
+            //     if(extraRotation < -270){
+            //         console.log(`extraRotation below -270°: ${extraRotation}`)
+            //     } else if(extraRotation < -180){
+            //         console.log(`extraRotation below -180°: ${extraRotation}`)
+            //     } else if(extraRotation < -90){
+            //         console.log(`extraRotation below -90°: ${extraRotation}`)
+            //     } else if(extraRotation < -45){
+            //         console.log(`extraRotation below -45°: ${extraRotation}`)
+            //     } else if(extraRotation < -30){
+            //         console.log(`extraRotation below -30°: ${extraRotation}`)
+            //     } else if(extraRotation < 0){
+            //         console.log(`extraRotation below 0°: ${extraRotation}`)
+            //     } else if(extraRotation >= 30){
+            //         console.log(`extraRotation exceeded 30°: ${extraRotation}`)
+            //     } else if(extraRotation >= 45){
+            //         console.log(`extraRotation exceeded 45°: ${extraRotation}`)
+            //     } else if(extraRotation >= 90){
+            //         console.log(`extraRotation exceeded 90°: ${extraRotation}`)
+            //     } else if(extraRotation >= 180){
+            //         console.log(`extraRotation exceeded 180°: ${extraRotation}`)
+            //     } else if(extraRotation >= 270){
+            //         console.log(`extraRotation exceeded 270°: ${extraRotation}`)
+            //     } else if(extraRotation >= 360) {
+            //         console.log(`extraRotation exceeded 360°: ${extraRotation}`)
+            //     }
+            // }
+            // If easedRotation is -86,
+            // If extraRotation is -30, then it's okay to add -30.
+            // If extraRotation is -181, then it's better to add 179.
+            // extraRotation < -181
+            // 360 + -181 = + 179
+            const compensatedRotation: number = (extraRotation) <= -180 ? (360 + extraRotation) : extraRotation;
+            const compensatedEasedRotation: number = compensatedRotation/easing;
+
+            // const newRotation: number = prevState.rotation + extraRotation/easing;
+            const newRotation: number = prevState.rotation + compensatedEasedRotation;
 
             // Unclear whether this should be before setState() call (now) or after (during componentWillUpdate() call).
-            this.props.onPositionUpdate(this.props.id, left, top, rotation);
+            this.props.onPositionUpdate(this.props.id, left, top, newRotation);
 
             return {
-                rotation: rotation,
+                rotation: newRotation,
                 left: left,
                 top: top,
                 hasDefinitelyArrived: this.hasArrivedAtCoord(props.targetLeft, left) && this.hasArrivedAtCoord(props.targetTop, top)
