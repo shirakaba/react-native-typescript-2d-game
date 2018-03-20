@@ -35,6 +35,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     private redBoxSize: number = 200;
     private blueBoxHalfSize: number = this.blueBoxSize / 2;
     private redBoxHalfSize: number = this.redBoxSize / 2;
+    private batchedState: Partial<BattlefieldState> = {};
     // private blueBoxHalfSize: number = 0;
     // private redBoxHalfSize: number = 0;
 
@@ -74,13 +75,37 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         this.update = this.update.bind(this);
     }
 
+    private batchState(state: Partial<BattlefieldState>): void {
+        // this.batchedState = {
+        //     ...this.batchedState,
+        //     ...state
+        // }
+
+        Object.assign(this.batchedState, state);
+    }
+
     // instead of loop()
     update() {
+        const currentFrame: number = this.frameNo;
         this.frameNo++;
+
+        this.setState(
+            this.batchedState as BattlefieldState,
+            () => {
+                // If this setState() callback misses the frame it was intended to operate within, skip the operation,
+                // so that we'll never have two callbacks updating the collision status on the same frame.
+                // EDIT: seems that it always misses the frame in practice!
+
+                // if(this.frameNo === currentFrame)
+                    this.updateCollisionStatus();
+            }
+        );
+        this.batchedState = {};
         // console.log(this.frameNo);
     };
 
     updateCollisionStatus(): void {
+        // These two don't seem to work as batchState() calls.
         if(this.isColliding(this.state.blueBoxPosition, this.state.redBoxPosition)){
             if(!this.state.colliding){
                 this.setState({
@@ -143,7 +168,14 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     onPositionUpdate(id: string, left: number, top: number, rotation: number): void {
         switch(id){
             case "red":
-                this.setState({
+                // this.setState({
+                //     redBoxPosition: {
+                //         left,
+                //         top,
+                //         rotation
+                //     }
+                // });
+                this.batchState({
                     redBoxPosition: {
                         left,
                         top,
@@ -153,10 +185,17 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 // By collision-checking inside onPositionUpdate(), we're still invoking it at the screen refresh rate
                 // (the rate at which this.advance() is called), but at least only when there's a change in box position.
                 // console.log(`[${this.frameNo}] RED`);
-                this.updateCollisionStatus();
+                // this.updateCollisionStatus();
                 break;
             case "blue":
-                this.setState({
+                // this.setState({
+                //     blueBoxPosition: {
+                //         left,
+                //         top,
+                //         rotation
+                //     }
+                // });
+                this.batchState({
                     blueBoxPosition: {
                         left,
                         top,
@@ -232,7 +271,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     // }
 
     moveBlueBox(left: number, top: number): void {
-        this.setState({
+        // this.setState({
+        this.batchState({
             blueBoxTarget: {
                 left: left - this.blueBoxHalfSize,
                 top: top - this.blueBoxHalfSize
