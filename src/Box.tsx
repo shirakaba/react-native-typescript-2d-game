@@ -125,9 +125,19 @@ export class Box extends Component<Props, State> {
             const left: number = (xDiff >= 0 ? Math.min(prevState.left + maxAdvanceX, props.targetLeft) : Math.max(prevState.left + maxAdvanceX, props.targetLeft));
             const top: number = (yDiff >= 0 ? Math.min(prevState.top + maxAdvanceY, props.targetTop) : Math.max(prevState.top + maxAdvanceY, props.targetTop));
             const extraRotation: number = angle * radToDeg - prevState.rotation;
+            // console.log(extraRotation);
             const easing: number = 4;
 
-            const optimalRotation: number = extraRotation <= -180 ? 360 + extraRotation : extraRotation;
+            const optimalRotation: number =
+                // If extraRotation is -181, then optimal to instead add 179 (360 + -181)
+                extraRotation < -180 ?
+                    360 + extraRotation :
+                    (
+                        // If extraRotation is 181, then optimal to instead add -179 (181 - 360)
+                        extraRotation > 180 ?
+                            extraRotation - 360 :
+                            extraRotation
+                    );
             const optimalEasedRotation: number = optimalRotation/easing;
 
             /* When adding prevState.rotation (e.g. 359°) simply to extraRotation, it self-regulates to stay within 360°
