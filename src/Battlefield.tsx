@@ -25,17 +25,19 @@ interface BoxTargetState {
 interface BoxPositionStates {
     redBoxPosition: BoxPositionState,
     // redBoxTarget: BoxTargetState,
-    blueBoxPosition: BoxPositionState
+    redBoxSize: number,
+    blueBoxPosition: BoxPositionState,
     blueBoxTarget: BoxTargetState
 }
 
 export class Battlefield extends Component<Props, BattlefieldState> {
     private frameNo: number = 0;
-    private blueBoxSize: number = 50;
-    private redBoxSize: number = 200;
+    private blueBoxSize: number = 25;
+    // private redBoxSize: number = 200;
     private blueBoxHalfSize: number = this.blueBoxSize / 2;
-    private redBoxHalfSize: number = this.redBoxSize / 2;
+    // private redBoxHalfSize: number = this.redBoxSize / 2;
     private batchedState: Partial<BattlefieldState> = {};
+    private scaleInterval: number;
     // private blueBoxHalfSize: number = 0;
     // private redBoxHalfSize: number = 0;
 
@@ -57,6 +59,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 top: redInitialTop,
                 rotation: 0
             },
+            redBoxSize: 50,
             // redBoxTarget: {
             //     left: redInitialLeft,
             //     top: redInitialTop
@@ -73,6 +76,11 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         };
 
         this.update = this.update.bind(this);
+        this.scaleInterval = setInterval(() => {
+            this.batchState({
+                redBoxSize: this.state.redBoxSize + 1
+            })
+        }, 200);
     }
 
     private batchState(state: Partial<BattlefieldState>): void {
@@ -87,6 +95,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
             this.batchState({
                 colliding: this.isColliding(
                     this.batchedState.redBoxPosition || this.state.redBoxPosition,
+                    this.batchedState.redBoxSize || this.state.redBoxSize,
                     this.batchedState.blueBoxPosition || this.state.blueBoxPosition
                 )
             });
@@ -97,11 +106,11 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         // console.log(this.frameNo);
     };
 
-    isColliding(red: BoxPositionState, blue: BoxPositionState): boolean {
+    isColliding(red: BoxPositionState, redSize: number, blue: BoxPositionState): boolean {
         const blueRight: number = blue.left + this.blueBoxSize;
         const blueBottom: number = blue.top + this.blueBoxSize;
-        const redRight: number = red.left + this.redBoxSize;
-        const redBottom: number = red.top + this.redBoxSize;
+        const redRight: number = red.left + redSize;
+        const redBottom: number = red.top + redSize;
         if(
             blueRight > red.left && blueRight < redRight || // blue's right edge is in bounds
             blue.left > red.left && blue.left < redRight // blue's left edge is in bounds
@@ -122,6 +131,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
 
     componentWillUnmount(): void {
         this.context.loop.unsubscribe(this.update);
+        clearInterval(this.scaleInterval);
     }
 
     onResponderGrant(ev: GestureResponderEvent): void {
@@ -276,12 +286,12 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     <Box
                         id={"red"}
                         speed={5 / (1000 / framerate)}
-                        size={this.redBoxSize}
+                        size={this.state.redBoxSize}
                         colour={"red"}
                         // targetLeft={this.state.redBoxTarget.left}
                         // targetTop={this.state.redBoxTarget.top}
-                        targetLeft={this.state.blueBoxPosition.left + this.blueBoxHalfSize - this.redBoxHalfSize}
-                        targetTop={this.state.blueBoxPosition.top + this.blueBoxHalfSize - this.redBoxHalfSize}
+                        targetLeft={this.state.blueBoxPosition.left + this.blueBoxHalfSize - this.state.redBoxSize/2}
+                        targetTop={this.state.blueBoxPosition.top + this.blueBoxHalfSize - this.state.redBoxSize/2}
                         onPositionUpdate={this.onPositionUpdate.bind(this)}
                     />
                     <Box

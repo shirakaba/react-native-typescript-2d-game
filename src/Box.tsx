@@ -21,7 +21,7 @@ interface Props {
 
 interface State {
     speed: number,
-    size: number,
+    // size: number,
     rotation: number,
     hasDefinitelyArrived: boolean,
     left: number,
@@ -34,6 +34,7 @@ export const radToDeg: number = 180/Math.PI;
 
 export class Box extends Component<Props, State> {
     private date: number = Date.now();
+    // static contextTypes
     // static propTypes = {
     //     radToDeg: 180/Math.PI // must be a function
     //     // keys: PropTypes.object,
@@ -51,12 +52,13 @@ export class Box extends Component<Props, State> {
 
         this.state = {
             speed: this.props.speed,
-            size: this.props.size,
             rotation: 0,
             hasDefinitelyArrived: true,
             left: this.props.targetLeft,
             top: this.props.targetTop
         };
+
+        // this.context.loop
 
         this.advance = this.advance.bind(this);
         this.hasArrivedAtCoord = this.hasArrivedAtCoord.bind(this);
@@ -160,6 +162,7 @@ export class Box extends Component<Props, State> {
     }
 
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
+        if(nextProps.size !== this.props.size) return true;
         if(this.state.top === nextState.top && this.state.left === nextState.left){
             // if(this.state !== nextState) console.log("top & left same, but no shallow equals.");
             if(this.props === nextProps){
@@ -182,8 +185,8 @@ export class Box extends Component<Props, State> {
             // top: this.props.targetTop,
             // left: this.state.left,
             // top: this.state.top,
-            width: this.state.size,
-            height: this.state.size,
+            width: this.props.size,
+            height: this.props.size,
             transform: [
                 { translateX: this.state.left },
                 { translateY: this.state.top },
