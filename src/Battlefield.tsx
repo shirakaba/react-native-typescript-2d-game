@@ -76,52 +76,28 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     }
 
     private batchState(state: Partial<BattlefieldState>): void {
-        // this.batchedState = {
-        //     ...this.batchedState,
-        //     ...state
-        // }
-
         Object.assign(this.batchedState, state);
     }
 
     // instead of loop()
     update() {
-        const currentFrame: number = this.frameNo;
         this.frameNo++;
 
-        this.setState(
-            this.batchedState as BattlefieldState,
-            () => {
-                // If this setState() callback misses the frame it was intended to operate within, skip the operation,
-                // so that we'll never have two callbacks updating the collision status on the same frame.
-                // EDIT: seems that it always misses the frame in practice!
+        if(this.batchedState.redBoxPosition || this.batchedState.blueBoxPosition){
+            this.batchState({
+                colliding: this.isColliding(
+                    this.batchedState.redBoxPosition || this.state.redBoxPosition,
+                    this.batchedState.blueBoxPosition || this.state.blueBoxPosition
+                )
+            });
+        }
 
-                // if(this.frameNo === currentFrame)
-                    this.updateCollisionStatus();
-            }
-        );
+        this.setState(this.batchedState as BattlefieldState);
         this.batchedState = {};
         // console.log(this.frameNo);
     };
 
-    updateCollisionStatus(): void {
-        // These two don't seem to work as batchState() calls.
-        if(this.isColliding(this.state.blueBoxPosition, this.state.redBoxPosition)){
-            if(!this.state.colliding){
-                this.setState({
-                    colliding: true
-                });
-            }
-        } else {
-            if(this.state.colliding){
-                this.setState({
-                    colliding: false
-                });
-            }
-        }
-    }
-
-    isColliding(blue: BoxPositionState, red: BoxPositionState): boolean {
+    isColliding(red: BoxPositionState, blue: BoxPositionState): boolean {
         const blueRight: number = blue.left + this.blueBoxSize;
         const blueBottom: number = blue.top + this.blueBoxSize;
         const redRight: number = red.left + this.redBoxSize;
