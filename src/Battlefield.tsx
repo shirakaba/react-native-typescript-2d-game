@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {Alert, GestureResponderEvent, StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
+import {GestureResponderEvent, StyleSheet, Text, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
-import {Box} from "./Box";
+import {Box, BoxTransforms} from "./Box";
+import {Direction, isColliding, Location} from "./utils";
 import PropTypes from 'prop-types';
 
 interface Props {
@@ -13,33 +14,19 @@ interface CollisionState {
     colliding: boolean
 }
 
-interface BoxPositionState extends BoxTargetState {
-    rotation: number
-}
-
-interface BoxTargetState {
-    left: number,
-    top: number
-}
-
 interface BoxPositionStates {
-    redBoxPosition: BoxPositionState,
-    // redBoxTarget: BoxTargetState,
+    redBoxTransform: BoxTransforms,
+    // red box will ALWAYS target blue's latest position.
     redBoxSize: number,
-    blueBoxPosition: BoxPositionState,
-    blueBoxTarget: BoxTargetState
+    blueBoxTransform: BoxTransforms,
+    blueBoxTargetLocation: Location
 }
 
 export class Battlefield extends Component<Props, BattlefieldState> {
     private frameNo: number = 0;
     private blueBoxSize: number = 25;
-    // private redBoxSize: number = 200;
-    private blueBoxHalfSize: number = this.blueBoxSize / 2;
-    // private redBoxHalfSize: number = this.redBoxSize / 2;
     private batchedState: Partial<BattlefieldState> = {};
     private scaleInterval: number;
-    // private blueBoxHalfSize: number = 0;
-    // private redBoxHalfSize: number = 0;
 
     static contextTypes = {
         loop: PropTypes.object,
@@ -54,32 +41,33 @@ export class Battlefield extends Component<Props, BattlefieldState> {
 
         this.state = {
             colliding: false,
-            redBoxPosition: {
+            redBoxTransform: {
                 left: redInitialLeft,
                 top: redInitialTop,
                 rotation: 0
             },
             redBoxSize: 50,
-            // redBoxTarget: {
-            //     left: redInitialLeft,
-            //     top: redInitialTop
-            // },
-            blueBoxPosition: {
+            blueBoxTransform: {
                 left: blueInitialLeft,
                 top: blueInitialTop,
                 rotation: 0
             },
-            blueBoxTarget: {
+            blueBoxTargetLocation: {
                 left: blueInitialLeft,
                 top: blueInitialTop
             }
         };
 
         this.update = this.update.bind(this);
+        this.beginTimedEvents();
+    }
+
+    private beginTimedEvents(): void {
         this.scaleInterval = setInterval(() => {
+            if(this.state.redBoxSize === 200) clearInterval(this.scaleInterval);
             this.batchState({
                 redBoxSize: this.state.redBoxSize + 1
-            })
+            });
         }, 200);
     }
 
@@ -87,43 +75,23 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         Object.assign(this.batchedState, state);
     }
 
-    // instead of loop()
-    update() {
+    private update(): void {
         this.frameNo++;
 
-        if(this.batchedState.redBoxPosition || this.batchedState.blueBoxPosition){
+        if(this.batchedState.redBoxTransform || this.batchedState.blueBoxTransform){
             this.batchState({
-                colliding: this.isColliding(
-                    this.batchedState.redBoxPosition || this.state.redBoxPosition,
+                colliding: isColliding(
+                    this.batchedState.redBoxTransform || this.state.redBoxTransform,
                     this.batchedState.redBoxSize || this.state.redBoxSize,
-                    this.batchedState.blueBoxPosition || this.state.blueBoxPosition
+                    this.batchedState.blueBoxTransform || this.state.blueBoxTransform,
+                    this.blueBoxSize
                 )
             });
         }
 
         this.setState(this.batchedState as BattlefieldState);
         this.batchedState = {};
-        // console.log(this.frameNo);
     };
-
-    isColliding(red: BoxPositionState, redSize: number, blue: BoxPositionState): boolean {
-        const blueRight: number = blue.left + this.blueBoxSize;
-        const blueBottom: number = blue.top + this.blueBoxSize;
-        const redRight: number = red.left + redSize;
-        const redBottom: number = red.top + redSize;
-        if(
-            blueRight > red.left && blueRight < redRight || // blue's right edge is in bounds
-            blue.left > red.left && blue.left < redRight // blue's left edge is in bounds
-        ){
-            if(
-                blue.top > red.top && blue.top < redBottom || // blue's top edge is in bounds
-                blueBottom < redBottom && blueBottom > red.top // blue's bottom edge is in bounds
-            ){
-                return true;
-            }
-        }
-        return false;
-    }
 
     componentDidMount(): void {
         this.context.loop.subscribe(this.update);
@@ -135,54 +103,28 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     }
 
     onResponderGrant(ev: GestureResponderEvent): void {
-        // console.log(`[onResponderGrant] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
-        this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
-        // this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        this.updateBlueBoxTarget(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
-    // Less frequent than screen update.
+    // Fired less frequently than screen update, at least for iOS simulator.
     onResponderMove(ev: GestureResponderEvent): void {
-        // console.log(`[onResponderMove] x: ${ev.nativeEvent.locationX}, y: ${ev.nativeEvent.locationY}, target: ${ev.nativeEvent.target}`);
-        // this.moveBlueBox(ev.nativeEvent.locationX, ev.nativeEvent.locationY);
-        // console.log(`[onResponderMove] ${this.frameNo}`);
-        // if(this.frameNo % 2 === 0)
-            this.moveBlueBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
-        // this.moveRedBox(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        this.updateBlueBoxTarget(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
-    // TODO: ideally queue the two setState calls, as we know both WILL be updating each frame.
     onPositionUpdate(id: string, left: number, top: number, rotation: number): void {
         switch(id){
             case "red":
-                // this.setState({
-                //     redBoxPosition: {
-                //         left,
-                //         top,
-                //         rotation
-                //     }
-                // });
                 this.batchState({
-                    redBoxPosition: {
+                    redBoxTransform: {
                         left,
                         top,
                         rotation
                     }
                 });
-                // By collision-checking inside onPositionUpdate(), we're still invoking it at the screen refresh rate
-                // (the rate at which this.advance() is called), but at least only when there's a change in box position.
-                // console.log(`[${this.frameNo}] RED`);
-                // this.updateCollisionStatus();
                 break;
             case "blue":
-                // this.setState({
-                //     blueBoxPosition: {
-                //         left,
-                //         top,
-                //         rotation
-                //     }
-                // });
                 this.batchState({
-                    blueBoxPosition: {
+                    blueBoxTransform: {
                         left,
                         top,
                         rotation
@@ -194,74 +136,11 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         }
     }
 
-    // shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<BattlefieldState>, nextContext: any): boolean {
-    //     // console.log(`this.state.redBoxPosition is ${JSON.stringify(this.state.redBoxPosition, null,3)}\n nextState.redBoxPosition is ${JSON.stringify(nextState.redBoxPosition, null, 3)}`);
-    //
-    //     // Battlefield doesn't currently receive any props any time.
-    //     // if(nextProps !== this.props){
-    //     //     console.log(nextProps);
-    //     // }
-    //
-    //     if(this.state === nextState){
-    //         // Never comes up, in practice.
-    //         // console.log("Same state (shallow).");
-    //     } else {
-    //         // console.log("State differed (shallow).");
-    //         if(this.state.redBoxPosition === nextState.redBoxPosition){
-    //             if(this.state.redBoxTarget === nextState.redBoxTarget){
-    //                 // console.log("redBoxPosition same (shallow), as well as its target (shallow)");
-    //                 // Can't return false here.
-    //                 if(this.state.blueBoxPosition === nextState.blueBoxPosition){
-    //                     // console.log("redBoxPosition same (shallow), as well as its target (shallow), and blueBoxPosition (shallow).");
-    //                     // Can't return false here.
-    //                     if(this.state.blueBoxTarget === nextState.blueBoxTarget){
-    //                         // Doesn't happen in practice.
-    //                         // console.log("redBoxPosition same (shallow), as well as its target (shallow), and blueBoxPosition (shallow) as well as its target (shallow).");
-    //                     } else {
-    //                         // console.log("redBoxPosition same (shallow), as well as its target (shallow), and blueBoxPosition (shallow) but not its target (shallow).");
-    //                         // Can't return false here.
-    //                     }
-    //                 } else {
-    //                     // console.log("redBoxPosition same (shallow), as well as its target (shallow), but not blueBoxPosition (shallow).");
-    //                     // Can't return false here.
-    //                     if(this.state.blueBoxTarget === nextState.blueBoxTarget){
-    //                         console.log("redBoxPosition same (shallow), as well as its target (shallow), but not blueBoxPosition (shallow) but still its target (shallow).");
-    //                         // Can't return false here.
-    //                     } else {
-    //                         // Doesn't happen in practice.
-    //                         console.log("redBoxPosition same (shallow), as well as its target (shallow), but not blueBoxPosition (shallow) nor its target (shallow).");
-    //                     }
-    //                 }
-    //             } else {
-    //                 // Never comes up in practice.
-    //                 // console.log("redBoxPosition same (shallow), but not its target");
-    //             }
-    //         } else {
-    //             // console.log("redBoxPosition differed (shallow)");
-    //
-    //         }
-    //     }
-    //
-    //     return true;
-    // }
-
-    // moveRedBox(left: number, top: number): void {
-    //     this.setState({
-    //         redBoxTarget: {
-    //             left: left - this.redBoxHalfSize,
-    //             top: top - this.redBoxHalfSize
-    //             // left: this.state.blueBoxPosition.left,
-    //             // top: this.state.blueBoxPosition.top
-    //         }
-    //     });
-    // }
-
-    moveBlueBox(left: number, top: number): void {
-        // this.setState({
+    updateBlueBoxTarget(left: number, top: number): void {
         this.batchState({
-            blueBoxTarget: {
-                left: left - this.blueBoxHalfSize,
-                top: top - this.blueBoxHalfSize
+            blueBoxTargetLocation: {
+                left: left - this.blueBoxSize/2,
+                top: top - this.blueBoxSize/2
             }
         });
     }
@@ -273,14 +152,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                 <View
                     style={styles.container}
                     onStartShouldSetResponder={(ev: GestureResponderEvent) => true}
-                    // onMoveShouldSetResponder={(ev: GestureResponderEvent) => false}
                     onResponderGrant={this.onResponderGrant.bind(this)}
-                    // onResponderGrant={(ev: GestureResponderEvent) => { console.log(`onResponderGrant():`, ev.nativeEvent); }}
-                    // onResponderReject={(ev: GestureResponderEvent) => { console.log(`onResponderReject():`, ev.nativeEvent); }}
                     onResponderMove={this.onResponderMove.bind(this)}
-                    // onResponderRelease={(ev: GestureResponderEvent) => { console.log(`onResponderRelease():`, ev.nativeEvent); }}
-                    // onResponderTerminationRequest={(ev: GestureResponderEvent) => true}
-                    // onResponderTerminate={(ev: GestureResponderEvent) => { console.log(`onResponderTerminate():`, ev.nativeEvent); }}
                 >
                     <Text style={styles.textbox}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     <Box
@@ -288,10 +161,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                         speed={5 / (1000 / framerate)}
                         size={this.state.redBoxSize}
                         colour={"red"}
-                        // targetLeft={this.state.redBoxTarget.left}
-                        // targetTop={this.state.redBoxTarget.top}
-                        targetLeft={this.state.blueBoxPosition.left + this.blueBoxHalfSize - this.state.redBoxSize/2}
-                        targetTop={this.state.blueBoxPosition.top + this.blueBoxHalfSize - this.state.redBoxSize/2}
+                        targetLeft={this.state.blueBoxTransform.left + this.blueBoxSize/2 - this.state.redBoxSize/2}
+                        targetTop={this.state.blueBoxTransform.top + this.blueBoxSize/2 - this.state.redBoxSize/2}
                         onPositionUpdate={this.onPositionUpdate.bind(this)}
                     />
                     <Box
@@ -299,8 +170,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                         speed={10 / (1000 / framerate)}
                         size={this.blueBoxSize}
                         colour={"blue"}
-                        targetLeft={this.state.blueBoxTarget.left}
-                        targetTop={this.state.blueBoxTarget.top}
+                        targetLeft={this.state.blueBoxTargetLocation.left}
+                        targetTop={this.state.blueBoxTargetLocation.top}
                         onPositionUpdate={this.onPositionUpdate.bind(this)}
                     />
             </View>
@@ -315,13 +186,10 @@ const styles = StyleSheet.create({
         height: "100%",
         width: "100%",
         backgroundColor: 'orange',
-        // flex: 1,
-        // alignItems: 'center',
-        // justifyContent: 'center',
     },
     textbox: {
         position: 'absolute',
-        left: 150,
+        left: 50,
         top: 50,
         fontSize: 20,
         fontWeight: 'bold'
