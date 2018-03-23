@@ -1,3 +1,6 @@
+// Copyright © 2018 Jamie Birch
+// Licensed under GPL; find at repo root, in LICENSE.txt.
+
 import React from 'react';
 import {GameLoop} from "./src/GameLoop";
 

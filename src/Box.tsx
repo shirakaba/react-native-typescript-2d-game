@@ -1,3 +1,6 @@
+// Copyright © 2018 Jamie Birch
+// Licensed under GPL; find at repo root, in LICENSE.txt.
+
 import React, { Component } from 'react';
 import {
     View, StyleSheet, ViewStyle, TextStyle, ImageStyle
