@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import {
-    View, StyleSheet, Text, ViewStyle, TextStyle, ImageStyle, RegisteredStyle,
-    GestureResponderEvent
+    View, StyleSheet, ViewStyle, TextStyle, ImageStyle
 } from 'react-native';
 import PropTypes from 'prop-types';
+import {hasArrivedAtCoord} from "./utils";
 
 interface Props {
     id: string,
@@ -25,9 +25,11 @@ interface State {
     top: number
 }
 
+// TODO: I want this to be a static class field, but not sure how to do so once PropTypes is imported (and interfering).
 export const radToDeg: number = 180/Math.PI;
 
 export class Box extends Component<Props, State> {
+    // TODO: inherit date on each frame from GameLoop so that both Box components act on the same date value for each frame.
     private date: number = Date.now();
 
     static contextTypes = {
@@ -46,27 +48,26 @@ export class Box extends Component<Props, State> {
         };
 
         this.advance = this.advance.bind(this);
-        this.hasArrivedAtCoord = this.hasArrivedAtCoord.bind(this);
-        this.hasArrived = this.hasArrived.bind(this);
+        this.hasArrivedAtTargetCoords = this.hasArrivedAtTargetCoords.bind(this);
         this.update = this.update.bind(this); // ABSOLUTELY necessary - update() is getting called from somewhere invisible.
     }
 
-    hasArrivedAtCoord(target: number, current: number): boolean {
-        return Math.abs(target - current) < 0.00001;
-    }
-
-    hasArrived(): boolean {
-        return this.hasArrivedAtCoord(this.props.targetLeft, this.state.left) && this.hasArrivedAtCoord(this.props.targetTop, this.state.top);
+    private hasArrivedAtTargetCoords(): boolean {
+        return hasArrivedAtCoord(this.props.targetLeft, this.state.left) && hasArrivedAtCoord(this.props.targetTop, this.state.top);
     }
 
     componentWillReceiveProps(nextProps: Props): void {
         this.setState({
-            hasDefinitelyArrived: this.hasArrivedAtCoord(nextProps.targetTop, this.state.top) && this.hasArrivedAtCoord(nextProps.targetLeft, this.state.left)
+            hasDefinitelyArrived: hasArrivedAtCoord(nextProps.targetTop, this.state.top) && hasArrivedAtCoord(nextProps.targetLeft, this.state.left)
         });
     }
 
+    /**
+     * Called each frame of the game loop.
+     * Checks whether the box has arrived at its target; otherwise, advances towards it. Updates the stored date to
+     * enable time-based displacement calculation for the advance() method.
+     */
     update() {
-        // this.date = Date.now();
         if(this.state.hasDefinitelyArrived){
             this.date = Date.now();
             return;
@@ -76,14 +77,19 @@ export class Box extends Component<Props, State> {
     };
 
     componentDidMount(): void {
-        this.context.loop.subscribe(this.update); // Not actually a Promise, despite what IDE might say.
+        this.context.loop.subscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
     }
 
     componentWillUnmount(): void {
-        this.context.loop.unsubscribe(this.update); // Not actually a Promise, despite what IDE might say.
+        this.context.loop.unsubscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
     }
 
-    advance(date: number): void {
+    /**
+     * Advance towards the target position. Movement speed is dependent on the time elapsed rather than the framerate,
+     * so it won't fall short of the expected distance if ever a frame is dropped. This is why date is a required param.
+     * If this can be written with some much simpler maths somehow, I'll cry.
+     */
+    private advance(date: number): void {
         const dateDiff: number = date - this.date;
         this.date = date;
 
@@ -131,7 +137,7 @@ export class Box extends Component<Props, State> {
                 rotation: newRotation,
                 left: left,
                 top: top,
-                hasDefinitelyArrived: this.hasArrivedAtCoord(props.targetLeft, left) && this.hasArrivedAtCoord(props.targetTop, top)
+                hasDefinitelyArrived: hasArrivedAtCoord(props.targetLeft, left) && hasArrivedAtCoord(props.targetTop, top)
             }
         });
     }
@@ -145,6 +151,10 @@ export class Box extends Component<Props, State> {
         return true;
     }
 
+    /**
+     * As an easy proof-of-concept, each Box is rendered as a View component, but it is likely much more efficient to
+     * render them with Canvas or some other dedicated graphics feature to reduce their overhead!
+     */
     render() {
         const individualStyle: Partial<ComponentStyle> = {
             backgroundColor: this.props.colour,

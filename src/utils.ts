@@ -7,6 +7,13 @@ export interface Location {
     top: number
 }
 
+/**
+ * "Good enough" rectangle-based collision detection. Obviously the red box becomes more dangerous (and the blue box
+ * becomes more vulnerable) when rotated, as the hitboxes increase to encompass their 'diamond shapes' in upright
+ * rectangles. In the original The Box Flash game, this was compensated for by simply reducing the hitbox size whilst
+ * the red box was rotated (and the blue box didn't even rotate!). This solution would be both practical and performant.
+ * TODO: implement Separating Axis Theorem-based collision detection if feeling brave.
+ */
 export function isColliding(a: Location, aSize: number, b: Location, bSize: number): boolean {
     const aRight: number = a.left + aSize;
     const aBottom: number = a.top + aSize;
@@ -26,4 +33,8 @@ export function isColliding(a: Location, aSize: number, b: Location, bSize: numb
         }
     }
     return false;
+}
+
+export function hasArrivedAtCoord(target: number, current: number): boolean {
+    return Math.abs(target - current) < 0.00001;
 }

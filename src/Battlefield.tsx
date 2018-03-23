@@ -8,13 +8,13 @@ import PropTypes from 'prop-types';
 interface Props {
 }
 
-type BattlefieldState = BoxPositionStates & CollisionState;
+type BattlefieldState = BoxStates & CollisionState;
 
 interface CollisionState {
     colliding: boolean
 }
 
-interface BoxPositionStates {
+interface BoxStates {
     redBoxTransform: BoxTransforms,
     // red box will ALWAYS target blue's latest position.
     redBoxSize: number,
@@ -25,6 +25,7 @@ interface BoxPositionStates {
 export class Battlefield extends Component<Props, BattlefieldState> {
     private frameNo: number = 0;
     private blueBoxSize: number = 25;
+    private redBoxSizeLimit: number = 200;
     private batchedState: Partial<BattlefieldState> = {};
     private scaleInterval: number;
 
@@ -34,16 +35,14 @@ export class Battlefield extends Component<Props, BattlefieldState> {
 
     constructor(props: Props) {
         super(props);
-        const redInitialLeft: number = 90;
-        const redInitialTop: number = 75;
         const blueInitialLeft: number = 200;
         const blueInitialTop: number = 400;
 
         this.state = {
             colliding: false,
             redBoxTransform: {
-                left: redInitialLeft,
-                top: redInitialTop,
+                left: 90,
+                top: 75,
                 rotation: 0
             },
             redBoxSize: 50,
@@ -64,21 +63,34 @@ export class Battlefield extends Component<Props, BattlefieldState> {
 
     private beginTimedEvents(): void {
         this.scaleInterval = setInterval(() => {
-            if(this.state.redBoxSize === 200) clearInterval(this.scaleInterval);
+            if(this.state.redBoxSize === this.redBoxSizeLimit) clearInterval(this.scaleInterval);
             this.batchState({
                 redBoxSize: this.state.redBoxSize + 1
             });
         }, 200);
     }
 
+    /**
+     * Instead of setting the Battlefield state any time state is lifted up to it or it has its own state to change, we
+     * prepare batches of state to be set only upon each frame update. This is hugely beneficial for performance.
+     * You can see for yourself by replacing all usages of batchState() with direct setState() calls!
+     * @param {Partial<BattlefieldState>} state
+     */
     private batchState(state: Partial<BattlefieldState>): void {
         Object.assign(this.batchedState, state);
     }
 
+    /**
+     * Called each frame of the game loop.
+     * Assesses the final state of the Battlefield each frame, based on the batches of state it has received by the time
+     * it has been called, then ultimately sets the state, prompting a render. Finally resets the batchedState.
+     */
     private update(): void {
         this.frameNo++;
 
         if(this.batchedState.redBoxTransform || this.batchedState.blueBoxTransform){
+            /* The batchedState is not guaranteed to have all fields populated each update, so we default to the latest
+             * known Battlefield state in each case. */
             this.batchState({
                 colliding: isColliding(
                     this.batchedState.redBoxTransform || this.state.redBoxTransform,
@@ -94,11 +106,11 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     };
 
     componentDidMount(): void {
-        this.context.loop.subscribe(this.update);
+        this.context.loop.subscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
     }
 
     componentWillUnmount(): void {
-        this.context.loop.unsubscribe(this.update);
+        this.context.loop.unsubscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
         clearInterval(this.scaleInterval);
     }
 
@@ -136,6 +148,10 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         }
     }
 
+    /**
+     * The blue box will advance towards this target location once per frame at a rate based on its 'speed' prop.
+     * The distance of advance each frame is dependent on time elapsed, and so will compensate if frames are dropped.
+     */
     updateBlueBoxTarget(left: number, top: number): void {
         this.batchState({
             blueBoxTargetLocation: {
@@ -146,7 +162,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     }
 
     render() {
-        const framerate: number = 60;
+        const framerate: number = 60; // TODO: get proper number from device info.
         return (
             <Loop>
                 <View
@@ -155,7 +171,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     onResponderGrant={this.onResponderGrant.bind(this)}
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
-                    <Text style={styles.textbox}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
+                    <Text style={styles.collisionIndicator}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     <Box
                         id={"red"}
                         speed={5 / (1000 / framerate)}
@@ -187,7 +203,7 @@ const styles = StyleSheet.create({
         width: "100%",
         backgroundColor: 'orange',
     },
-    textbox: {
+    collisionIndicator: {
         position: 'absolute',
         left: 50,
         top: 50,
