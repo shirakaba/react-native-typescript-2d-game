@@ -1,6 +1,14 @@
 // Copyright © 2018 Jamie Birch
 // Licensed under GPL; find at repo root, in LICENSE.txt.
 
+import {ImageStyle, TextStyle, ViewStyle} from "react-native";
+
+export interface StyleObject {
+    [key: string]: Partial<ComponentStyle>;
+}
+
+export type ComponentStyle = ViewStyle|ImageStyle|TextStyle;
+
 export interface Direction {
     rotation: number
 }

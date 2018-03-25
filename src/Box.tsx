@@ -6,7 +6,7 @@ import {
     View, StyleSheet, ViewStyle, TextStyle, ImageStyle
 } from 'react-native';
 import PropTypes from 'prop-types';
-import {hasArrivedAtCoord} from "./utils";
+import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "./utils";
 
 interface Props {
     id: string,
@@ -159,7 +159,7 @@ export class Box extends Component<Props, State> {
      * render them with Canvas or some other dedicated graphics feature to reduce their overhead!
      */
     render() {
-        const individualStyle: Partial<ComponentStyle> = {
+        const dynamicStyle: Partial<ComponentStyle> = {
             backgroundColor: this.props.colour,
             width: this.props.size,
             height: this.props.size,
@@ -172,22 +172,14 @@ export class Box extends Component<Props, State> {
 
         return (
             <View
-                style={[styles.generic, individualStyle]}
+                style={[styles.static, dynamicStyle]}
             />
         );
     }
 }
 
-export type ComponentStyle = ViewStyle|ImageStyle|TextStyle;
-export interface StyleObject {
-    [key: string]: Partial<ComponentStyle>;
-}
-export interface BoxStyleObject extends StyleObject {
-    generic: Partial<ViewStyle>;
-}
-
 const styles: StyleObject = StyleSheet.create<StyleObject>({
-    generic: {
+    static: {
         borderColor: "black",
         borderStyle: "solid",
         borderWidth: 1,

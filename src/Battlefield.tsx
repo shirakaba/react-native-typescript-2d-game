@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 import {GestureResponderEvent, StyleSheet, Text, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxTransforms} from "./Box";
-import {Direction, isColliding, Location} from "./utils";
+import {ComponentStyle, isColliding, Location, StyleObject} from "./utils";
 import PropTypes from 'prop-types';
 
 interface Props {
@@ -166,6 +166,10 @@ export class Battlefield extends Component<Props, BattlefieldState> {
 
     render() {
         const framerate: number = 60; // TODO: get proper number from device info.
+        const dynamicCollisionIndicatorStyle: Partial<ComponentStyle> = {
+            color: this.state.colliding ? "red" : "green"
+        };
+
         return (
             <Loop>
                 <View
@@ -174,7 +178,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     onResponderGrant={this.onResponderGrant.bind(this)}
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
-                    <Text style={styles.collisionIndicator}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
+                    <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     <Box
                         id={"red"}
                         speed={5 / (1000 / framerate)}
@@ -199,7 +203,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     }
 }
 
-const styles = StyleSheet.create({
+const styles: StyleObject = StyleSheet.create<StyleObject>({
     container: {
         position: 'absolute',
         height: "100%",
@@ -211,6 +215,10 @@ const styles = StyleSheet.create({
         left: 50,
         top: 50,
         fontSize: 20,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        // borderColor: "black",
+        // borderStyle: "dashed",
+        // borderWidth: 1,
+        backgroundColor: "rgba(255, 255, 0, 1)"
     }
 });
