@@ -47,9 +47,15 @@ For instructions on how exactly to make a project like this for yourself from sc
 
 ## Usage
 
-If you just want to try out the game without interacting with the repo, you can 
+### Installing as an app in the Expo Client
 
-### Global dependencies
+If you just want to try out the game without interacting with the repository, you can download it in the Expo Client via the URL:
+
+https://exp.host/@bottledlogic/the-box
+
+### Building from this repository
+
+#### Global dependencies
 
 If you haven't made a `create-react-native-app` project before, you may need to install the Xcode command-line tools (if you're a Mac user), `yarn`, `create-react-native-app` itself, and `watchman`. Here are the instructions to get set up (for Mac):
 
@@ -61,7 +67,7 @@ yarn global add create-react-native-app
 brew install watchman # Maybe not required, but I did it just in case.
 ```
 
-### Installation
+#### Installation
 
 ```bash
 git clone git@github.com:shirakaba/react-native-typescript-2d-game.git
@@ -69,7 +75,7 @@ cd react-native-typescript-2d-game
 yarn install
 ```
 
-### Running in the simulator
+#### Running in the simulator
 
 Either of these commands will load your app into the Expo app in your phone simulator. I believe the Expo app itself gets installed onto the simulator as a result of `yarn global add create-react-native-app` (or simply during the first time that either of these commands is run).
 
@@ -85,6 +91,6 @@ yarn run android
 
 Once the app is running, simply click anywhere on the screen to command the blue box! 
 
-### Troubleshooting
+#### Troubleshooting
 
 Refer to [How I created this project: Troubleshooting](https://github.com/shirakaba/react-native-typescript-2d-game/wiki/How-I-created-this-project#Troubleshooting)
