@@ -2,9 +2,10 @@
     "expo": {
         "name": "The Box",
         "description": "A simple 2D game (called The Box) implemented in React Native, as an Expo app, using TypeScript.",
-        "slug": "react-native-typescript-2d-game",
+        "slug": "the-box",
+        "githubUrl": "https://github.com/shirakaba/react-native-typescript-2d-game",
         "privacy": "public",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "orientation": "portrait",
         "primaryColor": "#fd9408",
         "icon": "./assets/icons/icon.png",
