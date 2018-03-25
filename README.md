@@ -1,6 +1,6 @@
 <div align="center">
-    <img src="screenshots/safe.png"/>
-    <img src="screenshots/colliding.png"/>
+    <img src="screenshots/safe.png" style="max-width: 400px; height: auto;"/>
+    <img src="screenshots/colliding.png" style="max-width: 400px; height: auto;"/>
 </div>
 
 # react-native-typescript-2d-game
