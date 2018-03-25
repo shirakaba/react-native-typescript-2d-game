@@ -47,6 +47,8 @@ For instructions on how exactly to make a project like this for yourself from sc
 
 ## Usage
 
+If you just want to try out the game without interacting with the repo, you can 
+
 ### Global dependencies
 
 If you haven't made a `create-react-native-app` project before, you may need to install the Xcode command-line tools (if you're a Mac user), `yarn`, `create-react-native-app` itself, and `watchman`. Here are the instructions to get set up (for Mac):
