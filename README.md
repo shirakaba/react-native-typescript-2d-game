@@ -3,7 +3,7 @@
     <img src="screenshots/colliding.png" width="400" />
 </div>
 
-# React Native Typescript 2D Game
+# React Native Typescript 2D Game (The Box)
 
 ## About
 
@@ -13,7 +13,7 @@ Around 2006, my brother made a simple Flash game called [The Box](https://birchl
 
 ### This project
 
-This repository aims to reproduce The Box using modern mobile technologies. Aspects that are implemented so far:
+This repository aims to reproduce The Box using modern mobile technologies. It's available on the Expo app store [here](https://expo.io/@bottledlogic/the-box). Aspects that are implemented so far:
 
 - [x] INTERACTIVE: Tap (or drag) to command the blue box where to go
 - [x] AI: Blue box follows the red box  
@@ -52,6 +52,8 @@ For instructions on how exactly to make a project like this for yourself from sc
 If you just want to try out the game without interacting with the repository, you can download it in the Expo Client via the URL:
 
 https://exp.host/@bottledlogic/the-box
+
+... Otherwise, follow the instructions in the next section to build it yourself.
 
 ### Building from this repository
 
