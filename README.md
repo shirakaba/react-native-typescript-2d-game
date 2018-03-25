@@ -5,6 +5,45 @@
 
 # React Native Typescript 2D Game
 
+## Usage
+
+### Global dependencies
+
+If you haven't made a `create-react-native-app` project before, you may need to install the Xcode command-line tools, `yarn`, `create-react-native-app` itself, and `watchman`. Here are the instructions to get set up for Mac:
+
+```bash
+brew update # For good luck
+xcode-select --install
+brew install yarn # This also implicitly installs a copy of node under brew (without npm)
+yarn global add create-react-native-app
+brew install watchman # Maybe not required, but I did it just in case.
+```
+
+### Installation
+
+```bash
+git clone git@github.com:shirakaba/react-native-typescript-2d-game.git
+cd react-native-typescript-2d-game
+yarn install
+```
+
+### Running in the simulator
+
+```bash
+yarn run ios
+```
+
+or:
+
+```bash
+yarn run android
+```
+
+### Troubleshooting
+
+Refer to [How I created this project: Troubleshooting](https://github.com/shirakaba/react-native-typescript-2d-game/wiki/How-I-created-this-project#Troubleshooting)
+
+
 ## About the game
 
 Around 2006, my brother made a simple Flash game called [The Box](https://birchlabs.co.uk/legacy/TheBox.html). In this game, you'd control a small blue box that has to run away from an ever-growing red box that is hunting it. The game would end upon the blue box being caught. You could attempt to live longer by picking up power-ups that would hinder the red box, but loss was ultimately inevitable.
