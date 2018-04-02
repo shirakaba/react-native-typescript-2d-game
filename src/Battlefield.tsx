@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 interface Props {
 }
 
-type BattlefieldState = BoxStates & CollisionState;
+type BattlefieldState = BoxStates & CollisionState & TimeState;
 
 interface CollisionState {
     colliding: boolean
@@ -23,6 +23,10 @@ interface BoxStates {
     redBoxSize: number,
     blueBoxTransform: BoxTransforms,
     blueBoxTargetLocation: Location
+}
+
+interface TimeState {
+    date: number;
 }
 
 export class Battlefield extends Component<Props, BattlefieldState> {
@@ -42,6 +46,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         const blueInitialTop: number = 400;
 
         this.state = {
+            date: Date.now(),
             colliding: false,
             redBoxTransform: {
                 left: 90,
@@ -90,6 +95,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
      */
     private update(): void {
         this.frameNo++;
+
+        this.batchedState.date = Date.now();
 
         if(this.batchedState.redBoxTransform || this.batchedState.blueBoxTransform){
             /* The batchedState is not guaranteed to have all fields populated each update, so we default to the latest
@@ -181,6 +188,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     <Box
                         id={"red"}
+                        date={this.state.date}
                         speed={5 / (1000 / framerate)}
                         size={this.state.redBoxSize}
                         colour={"red"}
@@ -190,6 +198,7 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     />
                     <Box
                         id={"blue"}
+                        date={this.state.date}
                         speed={10 / (1000 / framerate)}
                         size={this.blueBoxSize}
                         colour={"blue"}

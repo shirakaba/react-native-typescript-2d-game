@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "./utils";
 
 interface Props {
+    date: number,
     id: string,
     speed: number,
     size: number,
@@ -21,6 +22,7 @@ interface Props {
 export type BoxTransforms = Pick<State, "rotation" | "left" | "top">
 
 interface State {
+    lastFrameDate: number,
     speed: number,
     rotation: number,
     hasDefinitelyArrived: boolean,
@@ -32,9 +34,6 @@ interface State {
 export const radToDeg: number = 180/Math.PI;
 
 export class Box extends Component<Props, State> {
-    // TODO: inherit date on each frame from GameLoop so that both Box components act on the same date value for each frame.
-    private date: number = Date.now();
-
     static contextTypes = {
         loop: PropTypes.object,
     };
@@ -43,6 +42,7 @@ export class Box extends Component<Props, State> {
         super(props);
 
         this.state = {
+            lastFrameDate: this.props.date,
             speed: this.props.speed,
             rotation: 0,
             hasDefinitelyArrived: true,
@@ -72,10 +72,9 @@ export class Box extends Component<Props, State> {
      */
     update() {
         if(this.state.hasDefinitelyArrived){
-            this.date = Date.now();
             return;
         } else {
-            this.advance(Date.now());
+            this.advance(this.props.date);
         }
     };
 
@@ -93,8 +92,7 @@ export class Box extends Component<Props, State> {
      * If this can be written with some much simpler maths somehow, I'll cry.
      */
     private advance(date: number): void {
-        const dateDiff: number = date - this.date;
-        this.date = date;
+        const dateDiff: number = date - this.state.lastFrameDate;
 
         const xDiff: number = this.props.targetLeft - this.state.left;
         const yDiff: number = this.props.targetTop - this.state.top;
@@ -137,6 +135,7 @@ export class Box extends Component<Props, State> {
             this.props.onPositionUpdate(this.props.id, left, top, newRotation);
 
             return {
+                lastFrameDate: date,
                 rotation: newRotation,
                 left: left,
                 top: top,
