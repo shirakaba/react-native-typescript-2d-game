@@ -41,7 +41,7 @@ export class Item extends Component<Props, State> {
     }
 
     /**
-     * As an easy proof-of-concept, each Box is rendered as a View component, but it is likely much more efficient to
+     * As an easy proof-of-concept, each Item is rendered as a View component, but it is likely much more efficient to
      * render them with Canvas or some other dedicated graphics feature to reduce their overhead!
      */
     render() {

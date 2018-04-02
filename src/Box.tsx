@@ -22,7 +22,7 @@ interface Props {
 export type BoxTransforms = Pick<State, "rotation" | "left" | "top">
 
 interface State {
-    lastFrameDate: number,
+    lastFrameDate: number, // Used to calculate how far we have to move (our speed is based on time, not framerate)
     speed: number,
     rotation: number,
     hasDefinitelyArrived: boolean,
@@ -72,6 +72,9 @@ export class Box extends Component<Props, State> {
      */
     update() {
         if(this.state.hasDefinitelyArrived){
+            this.setState({
+                lastFrameDate: this.props.date
+            });
             return;
         } else {
             this.advance(this.props.date);
@@ -144,7 +147,10 @@ export class Box extends Component<Props, State> {
         });
     }
 
-    /** Very likely that my naive implementation has room for improvement here. Open to comments. */
+    /** Very likely that my naive implementation has room for improvement here. Open to comments.
+      * We don't want to re-render the component if the state change is purely non-visible (e.g. lastFrameDate or
+      * hasDefinitelyArrived). We do want to re-render it if the state change includes visible aspects (e.g. position
+      * and rotation). */
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
         if(nextProps.size !== this.props.size) return true;
         if(this.state.top === nextState.top && this.state.left === nextState.left){
