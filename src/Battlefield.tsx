@@ -211,6 +211,19 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         }
     }
 
+    shouldComponentUpdate(nextProps: Readonly<BattlefieldProps>, nextState: Readonly<BattlefieldState>, nextContext: any): boolean {
+        if(nextProps === this.props && nextState === this.state) return false;
+
+        // Visual props
+        if(this.props.windowDimensions !== nextProps.windowDimensions) return true;
+
+        // Visual state
+        // TODO: tell Battlefield to stop updating upon game-over (which hasn't been implemented yet).
+        // Pretty much all the Battlefield's state is visual, so no great saving to be made by doing deep comparisons.
+
+        return true;
+    }
+
     /**
      * The blue box will advance towards this target location once per frame at a rate based on its 'speed' prop.
      * The distance of advance each frame is dependent on time elapsed, and so will compensate if frames are dropped.
