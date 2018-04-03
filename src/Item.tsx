@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import {
     View, StyleSheet
 } from 'react-native';
-import {ComponentStyle, StyleObject} from "./utils";
+import {ComponentStyle, getRandomInt, StyleObject, Zone} from "./utils";
 
 export enum ItemType {
     Speed,

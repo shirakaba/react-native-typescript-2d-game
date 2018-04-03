@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 import {Dimensions, GestureResponderEvent, ScaledSize, StyleSheet, Text, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxTransforms} from "./Box";
-import {ComponentStyle, isColliding, Location, StyleObject} from "./utils";
+import {ComponentStyle, isColliding, Point, Size, StyleObject} from "./utils";
 import PropTypes from 'prop-types';
 import {Item, ItemType} from "./Item";
 import {DimensionsState} from "../App";
@@ -29,9 +29,9 @@ interface CollisionState {
 interface BoxStates {
     redBoxTransform: BoxTransforms,
     // red box will ALWAYS target blue's latest position.
-    redBoxSize: number,
+    redBoxLength: number,
     blueBoxTransform: BoxTransforms,
-    blueBoxTargetLocation: Location
+    blueBoxTargetLocation: Point
 }
 
 interface TimeState {
@@ -41,7 +41,7 @@ interface TimeState {
 
 export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private frameNo: number = 0;
-    private blueBoxSize: number = 25;
+    private blueBoxLength: number = 25;
     private redBoxSizeLimit: number = 200;
     private batchedState: Partial<BattlefieldState> = {};
     private scaleInterval: number;
@@ -67,7 +67,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 top: 75,
                 rotation: 0
             },
-            redBoxSize: 50,
+            redBoxLength: 50,
             blueBoxTransform: {
                 left: blueInitialLeft,
                 top: blueInitialTop,
@@ -84,9 +84,9 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
 
     private beginTimedEvents(): void {
         this.scaleInterval = setInterval(() => {
-            if(this.state.redBoxSize === this.redBoxSizeLimit) clearInterval(this.scaleInterval);
+            if(this.state.redBoxLength === this.redBoxSizeLimit) clearInterval(this.scaleInterval);
             this.batchState({
-                redBoxSize: this.state.redBoxSize + 1
+                redBoxLength: this.state.redBoxLength + 1
             });
         }, 200);
     }
@@ -113,14 +113,24 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         this.batchedState.currentFrameDate = Date.now();
 
         if(this.batchedState.redBoxTransform || this.batchedState.blueBoxTransform){
+            const redBoxTransform: Point = this.batchedState.redBoxTransform || this.state.redBoxTransform;
+            const redBoxLength: number = this.batchedState.redBoxLength || this.state.redBoxLength;
+            const blueBoxTransform: Point = this.batchedState.blueBoxTransform || this.state.blueBoxTransform;
+
             /* The batchedState is not guaranteed to have all fields populated each update, so we default to the latest
              * known Battlefield state in each case. */
             this.batchState({
                 colliding: isColliding(
-                    this.batchedState.redBoxTransform || this.state.redBoxTransform,
-                    this.batchedState.redBoxSize || this.state.redBoxSize,
-                    this.batchedState.blueBoxTransform || this.state.blueBoxTransform,
-                    this.blueBoxSize
+                    {
+                        ...redBoxTransform,
+                        width: redBoxLength,
+                        height: redBoxLength
+                    },
+                    {
+                        ...blueBoxTransform,
+                        width: this.blueBoxLength,
+                        height: this.blueBoxLength
+                    }
                 )
             });
         }
@@ -184,8 +194,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     updateBlueBoxTarget(left: number, top: number): void {
         this.batchState({
             blueBoxTargetLocation: {
-                left: left - this.blueBoxSize/2,
-                top: top - this.blueBoxSize/2
+                left: left - this.blueBoxLength/2,
+                top: top - this.blueBoxLength/2
             }
         });
     }
@@ -214,10 +224,10 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         currentFrameDate={this.state.currentFrameDate}
                         lastFrameDate={this.state.lastFrameDate}
                         speed={5 / (1000 / framerate)}
-                        size={this.state.redBoxSize}
+                        size={this.state.redBoxLength}
                         colour={"red"}
-                        targetLeft={this.state.blueBoxTransform.left + this.blueBoxSize/2 - this.state.redBoxSize/2}
-                        targetTop={this.state.blueBoxTransform.top + this.blueBoxSize/2 - this.state.redBoxSize/2}
+                        targetLeft={this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2}
+                        targetTop={this.state.blueBoxTransform.top + this.blueBoxLength/2 - this.state.redBoxLength/2}
                         onPositionUpdate={this.onPositionUpdate.bind(this)}
                     />
                     <Box
@@ -225,7 +235,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         currentFrameDate={this.state.currentFrameDate}
                         lastFrameDate={this.state.lastFrameDate}
                         speed={10 / (1000 / framerate)}
-                        size={this.blueBoxSize}
+                        size={this.blueBoxLength}
                         colour={"blue"}
                         targetLeft={this.state.blueBoxTargetLocation.left}
                         targetTop={this.state.blueBoxTargetLocation.top}
