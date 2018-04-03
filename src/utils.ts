@@ -25,6 +25,9 @@ export interface Size {
 
 export type Zone = Point & Size;
 
+export type milliseconds = number;
+export type seconds = number;
+
 /**
  * "Good enough" square-based collision detection. Obviously the red box becomes more dangerous (and the blue box
  * becomes more vulnerable) when rotated, as the hitboxes increase to encompass their 'diamond shapes' in upright

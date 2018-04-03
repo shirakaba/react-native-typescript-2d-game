@@ -5,7 +5,16 @@ import React, {Component} from 'react';
 import {Dimensions, GestureResponderEvent, ScaledSize, StyleSheet, Text, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxId, BoxTransforms} from "./Box";
-import {ComponentStyle, getPotentiallyUnoccupiedPoint, isColliding, Point, Size, StyleObject, Zone} from "./utils";
+import {
+    ComponentStyle,
+    getPotentiallyUnoccupiedPoint,
+    isColliding,
+    milliseconds,
+    Point,
+    Size,
+    StyleObject,
+    Zone
+} from "./utils";
 import PropTypes from 'prop-types';
 import {Item, ItemProps, itemLength, ItemType} from "./Item";
 import {DimensionsState} from "../App";
@@ -54,6 +63,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private redBoxSizeLimit: number = 200;
     private batchedState: Partial<BattlefieldState> = {};
     private scaleInterval: number;
+    private itemRestoreTimeouts: number[] = [];
+    private itemRestoreTime: milliseconds = 3000;
 
     static contextTypes = {
         loop: PropTypes.object,
@@ -182,6 +193,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     componentWillUnmount(): void {
         this.context.loop.unsubscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
         clearInterval(this.scaleInterval);
+        this.itemRestoreTimeouts.forEach((timeout: number) => clearInterval(timeout));
     }
 
     onResponderGrant(ev: GestureResponderEvent): void {
@@ -244,17 +256,19 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         case ItemType.Speed:
                             // TODO: Think deeply about whether this is alright; setState API would use prevState overload here.
                             stateBatch.blueBoxSpeed = (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) + 10;
-                            // TODO: set timer for this item to respawn.
                             break;
                         case ItemType.Shrink:
                             stateBatch.redBoxLength = Math.max(this.redBoxInitialLength, (this.batchedState.redBoxLength || this.state.redBoxLength) - 50);
                             break;
                         case ItemType.Teleport:
+                            // TODO: implement.
                             break;
                         case ItemType.Mine:
                             stateBatch.blueBoxSpeed = Math.max(1, (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) - 10);
                             break;
                     }
+
+                    this.restoreItem(i);
                 });
 
                 this.batchState(stateBatch);
@@ -262,6 +276,43 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             default:
                 break;
         }
+    }
+
+    // TODO: Remedy this naive implementation, which may suffer race conditions.
+    private restoreItem(index: number): void {
+        this.itemRestoreTimeouts[index] = setTimeout(
+            () => {
+                const items: ItemProps[] = JSON.parse(JSON.stringify((this.batchedState.items || this.state.items)));
+                items[index].consumed = false;
+
+                const point: Point = getPotentiallyUnoccupiedPoint(
+                    {
+                        left: 0,
+                        top: 0,
+                        width: this.props.windowDimensions.width,
+                        height: this.props.windowDimensions.height,
+                    },
+                    {
+                        left: this.state.blueBoxTransform.left,
+                        top: this.state.blueBoxTransform.top,
+                        width: this.blueBoxLength,
+                        height: this.blueBoxLength,
+                    },
+                    {
+                        width: itemLength,
+                        height: itemLength
+                    }
+                );
+
+                items[index].left = point.left;
+                items[index].top = point.top;
+
+                this.batchState({
+                    items
+                });
+            },
+            this.itemRestoreTime
+        );
     }
 
     // applySpeedBonusToHero(): void {
