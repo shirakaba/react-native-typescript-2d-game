@@ -9,7 +9,11 @@ import PropTypes from 'prop-types';
 import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "./utils";
 
 interface Props {
-    date: number,
+    // Used to calculate how far we have to move (our speed is based on time, not framerate)
+    lastFrameDate: number,
+    currentFrameDate: number,
+
+    // date: number,
     id: string,
     speed: number,
     size: number,
@@ -22,7 +26,6 @@ interface Props {
 export type BoxTransforms = Pick<State, "rotation" | "left" | "top">
 
 interface State {
-    lastFrameDate: number, // Used to calculate how far we have to move (our speed is based on time, not framerate)
     speed: number,
     rotation: number,
     hasDefinitelyArrived: boolean,
@@ -42,7 +45,6 @@ export class Box extends Component<Props, State> {
         super(props);
 
         this.state = {
-            lastFrameDate: this.props.date,
             speed: this.props.speed,
             rotation: 0,
             hasDefinitelyArrived: true,
@@ -72,12 +74,9 @@ export class Box extends Component<Props, State> {
      */
     update() {
         if(this.state.hasDefinitelyArrived){
-            this.setState({
-                lastFrameDate: this.props.date
-            });
             return;
         } else {
-            this.advance(this.props.date);
+            this.advance(this.props.currentFrameDate);
         }
     };
 
@@ -95,7 +94,7 @@ export class Box extends Component<Props, State> {
      * If this can be written with some much simpler maths somehow, I'll cry.
      */
     private advance(date: number): void {
-        const dateDiff: number = date - this.state.lastFrameDate;
+        const dateDiff: number = date - this.props.lastFrameDate;
 
         const xDiff: number = this.props.targetLeft - this.state.left;
         const yDiff: number = this.props.targetTop - this.state.top;
@@ -138,7 +137,7 @@ export class Box extends Component<Props, State> {
             this.props.onPositionUpdate(this.props.id, left, top, newRotation);
 
             return {
-                lastFrameDate: date,
+                // lastFrameDate: date,
                 rotation: newRotation,
                 left: left,
                 top: top,
@@ -152,11 +151,14 @@ export class Box extends Component<Props, State> {
       * hasDefinitelyArrived). We do want to re-render it if the state change includes visible aspects (e.g. position
       * and rotation). */
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
+        // Visual props
         if(nextProps.size !== this.props.size) return true;
-        if(this.state.top === nextState.top && this.state.left === nextState.left){
-            return false;
-        }
-        return true;
+
+        // Visual state
+        if(this.state.left !== nextState.left) return true;
+        if(this.state.top !== nextState.top) return true;
+
+        return false;
     }
 
     /**

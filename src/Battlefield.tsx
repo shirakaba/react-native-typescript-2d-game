@@ -26,7 +26,8 @@ interface BoxStates {
 }
 
 interface TimeState {
-    date: number;
+    lastFrameDate: number;
+    currentFrameDate: number;
 }
 
 export class Battlefield extends Component<Props, BattlefieldState> {
@@ -44,9 +45,11 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         super(props);
         const blueInitialLeft: number = 200;
         const blueInitialTop: number = 400;
+        const date: number = Date.now();
 
         this.state = {
-            date: Date.now(),
+            lastFrameDate: date,
+            currentFrameDate: date,
             colliding: false,
             redBoxTransform: {
                 left: 90,
@@ -96,7 +99,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
     private update(): void {
         this.frameNo++;
 
-        this.batchedState.date = Date.now();
+        this.batchedState.lastFrameDate = this.state.currentFrameDate;
+        this.batchedState.currentFrameDate = Date.now();
 
         if(this.batchedState.redBoxTransform || this.batchedState.blueBoxTransform){
             /* The batchedState is not guaranteed to have all fields populated each update, so we default to the latest
@@ -188,7 +192,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     <Box
                         id={"red"}
-                        date={this.state.date}
+                        currentFrameDate={this.state.currentFrameDate}
+                        lastFrameDate={this.state.lastFrameDate}
                         speed={5 / (1000 / framerate)}
                         size={this.state.redBoxSize}
                         colour={"red"}
@@ -198,7 +203,8 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     />
                     <Box
                         id={"blue"}
-                        date={this.state.date}
+                        currentFrameDate={this.state.currentFrameDate}
+                        lastFrameDate={this.state.lastFrameDate}
                         speed={10 / (1000 / framerate)}
                         size={this.blueBoxSize}
                         colour={"blue"}
