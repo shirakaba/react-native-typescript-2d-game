@@ -54,6 +54,8 @@ interface TimeState {
     currentFrameDate: number;
 }
 
+type BatchedStateComparativeCallback = (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => Partial<BattlefieldState>;
+
 const deviceFramerate: number = 60; // TODO: get proper number from device info.
 
 export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
@@ -62,6 +64,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private redBoxInitialLength: number = 50;
     private redBoxSizeLimit: number = 200;
     private batchedState: Partial<BattlefieldState> = {};
+    private batchedStateComparativeCallbacks: BatchedStateComparativeCallback[] = [];
+    private batchedStateSetCallbacks: (()=>void)[] = [];
     private scaleInterval: number;
     private itemRestoreTimeouts: number[] = [];
     private itemRestoreTime: milliseconds = 3000;
@@ -138,10 +142,24 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
      * prepare batches of state to be set only upon each frame update. This is hugely beneficial for performance.
      * You can see for yourself by replacing all usages of batchState() with direct setState() calls!
      * @param {Partial<BattlefieldState>} state
+     * @param callback
      */
-    private batchState(state: Partial<BattlefieldState>): void {
-        Object.assign(this.batchedState, state);
+    private batchState(
+        state: Partial<BattlefieldState> | BatchedStateComparativeCallback,
+        callback?: () => void
+    ): void {
+        if(typeof state === "function"){
+            this.batchedStateComparativeCallbacks.push(state);
+        } else {
+            Object.assign(this.batchedState, state);
+        }
+
+        if(callback) this.batchedStateSetCallbacks.push(callback);
     }
+
+    // private batchState(state: (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => void): void {
+    //     // Object.assign(this.batchedState, state);
+    // }
 
     /**
      * Called each frame of the game loop.
@@ -177,8 +195,44 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             });
         }
 
-        this.setState(this.batchedState as BattlefieldState);
+        // Hold refs to each of these values as we'll read from them asynchronously and they will soon be blanked out.
+        const batchedState = this.batchedState;
+        const batchedStateSetCallbacks: (()=>void)[] = this.batchedStateSetCallbacks;
+        const batchedStateComparativeCallbacks = this.batchedStateComparativeCallbacks;
+
+        if(batchedStateComparativeCallbacks.length > 0){
+            console.log(`batchedStateComparativeCallbacks length: ${batchedStateComparativeCallbacks.length}`);
+            this.setState(
+                (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => {
+                    console.log(`this.batchedState:`, batchedState);
+                    return batchedStateComparativeCallbacks
+                    .reduce(
+                        (acc: Partial<BattlefieldState>, batchCb: BatchedStateComparativeCallback, i: number, arr: BatchedStateComparativeCallback[]) => {
+                            return Object.assign(acc, batchCb.call(this, Object.assign(prevState, acc), props));
+                        },
+                        batchedState as BattlefieldState
+                    );
+                },
+                batchedStateSetCallbacks.length > 0 ?
+                    () => {
+                        batchedStateSetCallbacks.forEach((callback: () => void) => callback());
+                    } :
+                    undefined
+            );
+        } else {
+            this.setState(
+                batchedState as BattlefieldState,
+                batchedStateSetCallbacks.length > 0 ?
+                    () => {
+                        batchedStateSetCallbacks.forEach((callback: () => void) => callback());
+                    } :
+                    undefined
+            );
+        }
+
         this.batchedState = {};
+        this.batchedStateSetCallbacks = [];
+        this.batchedStateComparativeCallbacks = [];
     };
 
     /**
@@ -254,17 +308,19 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
 
                     switch(item.type){
                         case ItemType.Speed:
-                            // TODO: Think deeply about whether this is alright; setState API would use prevState overload here.
-                            stateBatch.blueBoxSpeed = (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) + 10;
+                            // stateBatch.blueBoxSpeed = (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) + 10;
+                            this.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed: prevState.blueBoxSpeed + 10 }));
                             break;
                         case ItemType.Shrink:
-                            stateBatch.redBoxLength = Math.max(this.redBoxInitialLength, (this.batchedState.redBoxLength || this.state.redBoxLength) - 50);
+                            // stateBatch.redBoxLength = Math.max(this.redBoxInitialLength, (this.batchedState.redBoxLength || this.state.redBoxLength) - 50);
+                            this.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ redBoxLength:  Math.max(this.redBoxInitialLength, prevState.redBoxLength - 100) }));
                             break;
                         case ItemType.Teleport:
                             // TODO: implement.
                             break;
                         case ItemType.Mine:
-                            stateBatch.blueBoxSpeed = Math.max(1, (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) - 10);
+                            // stateBatch.blueBoxSpeed = Math.max(1, (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) - 10);
+                            this.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed:  Math.max(1, prevState.blueBoxSpeed - 10) }));
                             break;
                     }
 
