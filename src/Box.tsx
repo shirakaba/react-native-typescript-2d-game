@@ -8,19 +8,24 @@ import {
 import PropTypes from 'prop-types';
 import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "./utils";
 
+export const enum BoxId {
+    Hero,
+    Villain
+}
+
 interface Props {
     // Used to calculate how far we have to move (our speed is based on time, not framerate)
     lastFrameDate: number,
     currentFrameDate: number,
 
     // date: number,
-    id: string,
+    id: BoxId,
     speed: number,
     size: number,
     colour: string,
     targetLeft: number,
     targetTop: number,
-    onPositionUpdate: (id: string, left: number, top: number, rotation: number) => void
+    onPositionUpdate: (id: BoxId, left: number, top: number, rotation: number) => void
 }
 
 export type BoxTransforms = Pick<State, "rotation" | "left" | "top">

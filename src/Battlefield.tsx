@@ -4,7 +4,7 @@
 import React, {Component} from 'react';
 import {Dimensions, GestureResponderEvent, ScaledSize, StyleSheet, Text, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
-import {Box, BoxTransforms} from "./Box";
+import {Box, BoxId, BoxTransforms} from "./Box";
 import {ComponentStyle, getPotentiallyUnoccupiedPoint, isColliding, Point, Size, StyleObject, Zone} from "./utils";
 import PropTypes from 'prop-types';
 import {Item, ItemProps, itemLength, ItemType} from "./Item";
@@ -186,9 +186,9 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         this.updateBlueBoxTarget(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
-    onPositionUpdate(id: string, left: number, top: number, rotation: number): void {
+    onPositionUpdate(id: BoxId, left: number, top: number, rotation: number): void {
         switch(id){
-            case "red":
+            case BoxId.Villain:
                 this.batchState({
                     redBoxTransform: {
                         left,
@@ -197,7 +197,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     }
                 });
                 break;
-            case "blue":
+            case BoxId.Hero:
                 this.batchState({
                     blueBoxTransform: {
                         left,
@@ -272,7 +272,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     {/*<Item id={2} type={ItemType.Mine} left={300} top={210}/>*/}
                     {/*<Item id={3} type={ItemType.Shrink} left={360} top={800}/>*/}
                     <Box
-                        id={"red"}
+                        id={BoxId.Villain}
                         currentFrameDate={this.state.currentFrameDate}
                         lastFrameDate={this.state.lastFrameDate}
                         speed={5 / (1000 / framerate)}
@@ -283,7 +283,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         onPositionUpdate={this.onPositionUpdate.bind(this)}
                     />
                     <Box
-                        id={"blue"}
+                        id={BoxId.Hero}
                         currentFrameDate={this.state.currentFrameDate}
                         lastFrameDate={this.state.lastFrameDate}
                         speed={10 / (1000 / framerate)}
