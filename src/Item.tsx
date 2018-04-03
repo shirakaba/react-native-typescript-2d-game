@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import {
     View, StyleSheet
 } from 'react-native';
-import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "./utils";
+import {ComponentStyle, StyleObject} from "./utils";
 
 export enum ItemType {
     Speed,
@@ -25,8 +25,12 @@ interface State {
     consumed: boolean
 }
 
+// TODO: Figure out how to rewrite as class static.
+const size: number = 10;
+
 export class Item extends Component<Props, State> {
-    private static size: number = 10;
+    // TODO: Find out why static values don't work in a React component. May be due to PropTypes.
+    // private static size: number = 10;
     private readonly colour: string;
 
     constructor(props: Props) {
@@ -80,8 +84,8 @@ export class Item extends Component<Props, State> {
     render() {
         const dynamicStyle: Partial<ComponentStyle> = {
             backgroundColor: this.colour,
-            width: Item.size,
-            height: Item.size,
+            width: size,
+            height: size,
             transform: [
                 { translateX: this.props.left },
                 { translateY: this.props.top }
