@@ -26,7 +26,7 @@ interface State {
 }
 
 // TODO: Figure out how to rewrite as class static.
-const size: number = 10;
+export const itemSize: number = 10;
 
 export class Item extends Component<Props, State> {
     // TODO: Find out why static values don't work in a React component. May be due to PropTypes.
@@ -84,8 +84,8 @@ export class Item extends Component<Props, State> {
     render() {
         const dynamicStyle: Partial<ComponentStyle> = {
             backgroundColor: this.colour,
-            width: size,
-            height: size,
+            width: itemSize,
+            height: itemSize,
             transform: [
                 { translateX: this.props.left },
                 { translateY: this.props.top }
