@@ -69,7 +69,6 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         };
 
         this.update = this.update.bind(this);
-        this.beginTimedEvents();
     }
 
     private beginTimedEvents(): void {
@@ -119,8 +118,13 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         this.batchedState = {};
     };
 
+    /**
+     * Any tasks that may have side-effects (e.g. setState()) are recommended to be done here rather than in constructor:
+     * https://stackoverflow.com/a/40832293/5951226
+     */
     componentDidMount(): void {
         this.context.loop.subscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
+        this.beginTimedEvents();
     }
 
     componentWillUnmount(): void {
