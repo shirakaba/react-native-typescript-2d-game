@@ -2,16 +2,25 @@
 // Licensed under GPL; find at repo root, in LICENSE.txt.
 
 import React, {Component} from 'react';
-import {GestureResponderEvent, StyleSheet, Text, View} from 'react-native';
+import {Dimensions, GestureResponderEvent, ScaledSize, StyleSheet, Text, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxTransforms} from "./Box";
 import {ComponentStyle, isColliding, Location, StyleObject} from "./utils";
 import PropTypes from 'prop-types';
+import {Item, ItemType} from "./Item";
+import {DimensionsState} from "../App";
+
+type BattlefieldProps = Props & DimensionsState;
 
 interface Props {
 }
 
-type BattlefieldState = BoxStates & CollisionState & TimeState;
+type BattlefieldState = BoxStates & CollisionState & TimeState & BattlefieldDimensionsState;
+
+interface BattlefieldDimensionsState {
+    stageWidth: number;
+    stageHeight: number;
+}
 
 interface CollisionState {
     colliding: boolean
@@ -30,7 +39,7 @@ interface TimeState {
     currentFrameDate: number;
 }
 
-export class Battlefield extends Component<Props, BattlefieldState> {
+export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private frameNo: number = 0;
     private blueBoxSize: number = 25;
     private redBoxSizeLimit: number = 200;
@@ -41,13 +50,15 @@ export class Battlefield extends Component<Props, BattlefieldState> {
         loop: PropTypes.object,
     };
 
-    constructor(props: Props) {
+    constructor(props: BattlefieldProps) {
         super(props);
         const blueInitialLeft: number = 200;
         const blueInitialTop: number = 400;
         const date: number = Date.now();
 
         this.state = {
+            stageWidth: this.props.windowDimensions.width,
+            stageHeight: this.props.windowDimensions.height,
             lastFrameDate: date,
             currentFrameDate: date,
             colliding: false,
@@ -194,6 +205,10 @@ export class Battlefield extends Component<Props, BattlefieldState> {
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
                     <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
+                    <Item id={0} type={ItemType.Teleport} left={100} top={100}/>
+                    <Item id={1} type={ItemType.Speed} left={250} top={370}/>
+                    <Item id={2} type={ItemType.Mine} left={300} top={210}/>
+                    <Item id={3} type={ItemType.Shrink} left={360} top={800}/>
                     <Box
                         id={"red"}
                         currentFrameDate={this.state.currentFrameDate}
