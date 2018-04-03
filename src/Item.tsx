@@ -7,8 +7,16 @@ import {
 } from 'react-native';
 import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "./utils";
 
+export enum ItemType {
+    Speed,
+    Shrink,
+    Teleport,
+    Mine,
+}
+
 interface Props {
-    id: string,
+    id: number,
+    type: ItemType,
     left: number,
     top: number
 }
@@ -18,9 +26,13 @@ interface State {
 }
 
 export class Item extends Component<Props, State> {
+    private static size: number = 10;
+    private readonly colour: string;
 
     constructor(props: Props) {
         super(props);
+
+        this.colour = Item.mapItemTypeToColour(props.type);
 
         this.state = {
             consumed: false
@@ -35,9 +47,30 @@ export class Item extends Component<Props, State> {
 
     /** Very likely that my naive implementation has room for improvement here. Open to comments. */
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
-        if(nextProps === this.props) return false;
-        if(nextProps.top === this.props.top && nextProps.left === this.props.left) return false;
-        return true;
+        // Visual props
+        // if(nextProps === this.props) return false;
+        if(this.props.left !== nextProps.left) return true;
+        if(this.props.top !== nextProps.top) return true;
+
+        // Visual state
+        if(this.state.consumed !== nextState.consumed) return true;
+
+        return false;
+    }
+
+    static mapItemTypeToColour(type: ItemType): string {
+        switch(type){
+            case ItemType.Speed:
+                return "yellow";
+            case ItemType.Shrink:
+                return "white";
+            case ItemType.Teleport:
+                return "cyan";
+            case ItemType.Mine:
+                return "gray";
+            default:
+                return "black";
+        }
     }
 
     /**
@@ -46,13 +79,14 @@ export class Item extends Component<Props, State> {
      */
     render() {
         const dynamicStyle: Partial<ComponentStyle> = {
-            backgroundColor: this.props.colour,
-            width: this.props.size,
-            height: this.props.size,
+            backgroundColor: this.colour,
+            width: Item.size,
+            height: Item.size,
             transform: [
                 { translateX: this.props.left },
                 { translateY: this.props.top }
-            ]
+            ],
+            display: this.state.consumed ? "none" : "flex"
         };
 
         return (
