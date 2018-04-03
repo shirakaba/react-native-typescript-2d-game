@@ -5,9 +5,9 @@ import React, {Component} from 'react';
 import {Dimensions, GestureResponderEvent, ScaledSize, StyleSheet, Text, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxTransforms} from "./Box";
-import {ComponentStyle, isColliding, Point, Size, StyleObject} from "./utils";
+import {ComponentStyle, getPotentiallyUnoccupiedPoint, isColliding, Point, Size, StyleObject, Zone} from "./utils";
 import PropTypes from 'prop-types';
-import {Item, ItemType} from "./Item";
+import {Item, ItemProps, itemLength, ItemType} from "./Item";
 import {DimensionsState} from "../App";
 
 type BattlefieldProps = Props & DimensionsState;
@@ -15,7 +15,7 @@ type BattlefieldProps = Props & DimensionsState;
 interface Props {
 }
 
-type BattlefieldState = BoxStates & CollisionState & TimeState & BattlefieldDimensionsState;
+type BattlefieldState = BoxStates & CollisionState & TimeState & BattlefieldDimensionsState & ItemStates;
 
 interface BattlefieldDimensionsState {
     stageWidth: number;
@@ -32,6 +32,10 @@ interface BoxStates {
     redBoxLength: number,
     blueBoxTransform: BoxTransforms,
     blueBoxTargetLocation: Point
+}
+
+interface ItemStates {
+    items: ItemProps[];
 }
 
 interface TimeState {
@@ -56,7 +60,31 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         const blueInitialTop: number = 400;
         const date: number = Date.now();
 
+        const blueBoxTransform: BoxTransforms = {
+            left: blueInitialLeft,
+            top: blueInitialTop,
+            rotation: 0
+        };
+
         this.state = {
+            items: this.mapItemTypesToItemStates(
+                {
+                    left: 0,
+                    top: 0,
+                    width: this.props.windowDimensions.width,
+                    height: this.props.windowDimensions.height,
+                },
+                {
+                    left: blueBoxTransform.left,
+                    top: blueBoxTransform.top,
+                    width: this.blueBoxLength,
+                    height: this.blueBoxLength,
+                },
+                {
+                    width: itemLength,
+                    height: itemLength
+                }
+            ),
             stageWidth: this.props.windowDimensions.width,
             stageHeight: this.props.windowDimensions.height,
             lastFrameDate: date,
@@ -68,11 +96,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 rotation: 0
             },
             redBoxLength: 50,
-            blueBoxTransform: {
-                left: blueInitialLeft,
-                top: blueInitialTop,
-                rotation: 0
-            },
+            blueBoxTransform,
             blueBoxTargetLocation: {
                 left: blueInitialLeft,
                 top: blueInitialTop
@@ -200,6 +224,20 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         });
     }
 
+    private mapItemTypesToItemStates(allowedZone: Zone, forbiddenZone: Zone, itemSize: Size): ItemProps[] {
+        // Iterating over TypeScript enums: https://stackoverflow.com/a/21294925/5951226
+        return Object.keys(ItemType)
+        .filter((key: string) => typeof ItemType[key] === "number")
+        .map((key: string, i: number) => {
+            const unoccupiedPoint: Point = getPotentiallyUnoccupiedPoint(allowedZone, forbiddenZone, itemSize);
+            return {
+                type: ItemType[key],
+                left: unoccupiedPoint.left,
+                top: unoccupiedPoint.top,
+            };
+        })
+    }
+
     render() {
         const framerate: number = 60; // TODO: get proper number from device info.
         const dynamicCollisionIndicatorStyle: Partial<ComponentStyle> = {
@@ -215,10 +253,11 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
                     <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
-                    <Item id={0} type={ItemType.Teleport} left={100} top={100}/>
-                    <Item id={1} type={ItemType.Speed} left={250} top={370}/>
-                    <Item id={2} type={ItemType.Mine} left={300} top={210}/>
-                    <Item id={3} type={ItemType.Shrink} left={360} top={800}/>
+                    { this.state.items.map((item: ItemProps, i: number) => <Item key={i} type={item.type} left={item.left} top={item.top}/>) }
+                    {/*<Item id={0} type={ItemType.Teleport} left={100} top={100}/>*/}
+                    {/*<Item id={1} type={ItemType.Speed} left={250} top={370}/>*/}
+                    {/*<Item id={2} type={ItemType.Mine} left={300} top={210}/>*/}
+                    {/*<Item id={3} type={ItemType.Shrink} left={360} top={800}/>*/}
                     <Box
                         id={"red"}
                         currentFrameDate={this.state.currentFrameDate}
