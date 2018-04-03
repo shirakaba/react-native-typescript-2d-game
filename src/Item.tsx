@@ -18,11 +18,12 @@ export interface ItemProps {
     // id: number,
     type: ItemType,
     left: number,
-    top: number
+    top: number,
+    consumed: boolean
 }
 
 interface State {
-    consumed: boolean
+    // consumed: boolean
 }
 
 // TODO: Figure out how to rewrite as class static.
@@ -55,9 +56,10 @@ export class Item extends Component<ItemProps, State> {
         // if(nextProps === this.props) return false;
         if(this.props.left !== nextProps.left) return true;
         if(this.props.top !== nextProps.top) return true;
+        if(this.props.consumed !== nextProps.consumed) return true;
 
         // Visual state
-        if(this.state.consumed !== nextState.consumed) return true;
+        // if(this.state.consumed !== nextState.consumed) return true;
 
         return false;
     }
@@ -90,7 +92,7 @@ export class Item extends Component<ItemProps, State> {
                 { translateX: this.props.left },
                 { translateY: this.props.top }
             ],
-            display: this.state.consumed ? "none" : "flex"
+            display: this.props.consumed ? "none" : "flex"
         };
 
         return (

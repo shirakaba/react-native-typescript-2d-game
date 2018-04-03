@@ -28,10 +28,12 @@ interface CollisionState {
 
 interface BoxStates {
     redBoxTransform: BoxTransforms,
+    redBoxSpeed: number,
     // red box will ALWAYS target blue's latest position.
     redBoxLength: number,
     blueBoxTransform: BoxTransforms,
-    blueBoxTargetLocation: Point
+    blueBoxTargetLocation: Point,
+    blueBoxSpeed: number
 }
 
 interface ItemStates {
@@ -42,6 +44,8 @@ interface TimeState {
     lastFrameDate: number;
     currentFrameDate: number;
 }
+
+const deviceFramerate: number = 60; // TODO: get proper number from device info.
 
 export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private frameNo: number = 0;
@@ -96,6 +100,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 rotation: 0
             },
             redBoxLength: 50,
+            redBoxSpeed: 3,
+            blueBoxSpeed: 5,
             blueBoxTransform,
             blueBoxTargetLocation: {
                 left: blueInitialLeft,
@@ -198,18 +204,66 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 });
                 break;
             case BoxId.Hero:
-                this.batchState({
+                const stateBatch: Partial<Pick<BattlefieldState, "blueBoxTransform"|"items"|"blueBoxSpeed">> = {
                     blueBoxTransform: {
                         left,
                         top,
                         rotation
                     }
+                };
+
+                (this.batchedState.items || this.state.items)
+                .forEach((item: ItemProps, i: number, items: ItemProps[]) => {
+                    // This is an obvious use case for filter(), but we use forEach() to keep the index into the unfiltered array.
+                    if(items[i].consumed) return;
+
+                    const isConsumed: boolean = isColliding(
+                        {
+                            left,
+                            top,
+                            width: this.blueBoxLength,
+                            height: this.blueBoxLength
+                        },
+                        {
+                            left: item.left,
+                            top: item.top,
+                            width: itemLength,
+                            height: itemLength,
+                        }
+                    );
+
+                    if(!isConsumed) return;
+                    console.log(`Consumed item[${i}]; type ${item.type}!`);
+
+                    // We only deep copy the items once we identify that we have to.
+                    if(typeof stateBatch.items === "undefined") stateBatch.items = JSON.parse(JSON.stringify(items));
+                    stateBatch.items[i].consumed = true;
+
+                    switch(item.type){
+                        case ItemType.Speed:
+                            // TODO: Think deeply about whether this is alright; setState API would use prevState overload here.
+                            stateBatch.blueBoxSpeed = (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) + 10;
+                            // TODO: set timer for this item to respawn.
+                            break;
+                        case ItemType.Shrink:
+                            break;
+                        case ItemType.Teleport:
+                            break;
+                        case ItemType.Mine:
+                            break;
+                    }
                 });
+
+                this.batchState(stateBatch);
                 break;
             default:
                 break;
         }
     }
+    
+    // applySpeedBonusToHero(): void {
+    //     this.setState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ speed: prevState.speed + 10 }));
+    // }
 
     shouldComponentUpdate(nextProps: Readonly<BattlefieldProps>, nextState: Readonly<BattlefieldState>, nextContext: any): boolean {
         if(nextProps === this.props && nextState === this.state) return false;
@@ -247,12 +301,12 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 type: ItemType[key],
                 left: unoccupiedPoint.left,
                 top: unoccupiedPoint.top,
+                consumed: false,
             };
         })
     }
 
     render() {
-        const framerate: number = 60; // TODO: get proper number from device info.
         const dynamicCollisionIndicatorStyle: Partial<ComponentStyle> = {
             color: this.state.colliding ? "red" : "green"
         };
@@ -266,12 +320,12 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
                     <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
-                    { this.state.items.map((item: ItemProps, i: number) => <Item key={i} type={item.type} left={item.left} top={item.top}/>) }
+                    { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
                     <Box
                         id={BoxId.Villain}
                         currentFrameDate={this.state.currentFrameDate}
                         lastFrameDate={this.state.lastFrameDate}
-                        speed={5 / (1000 / framerate)}
+                        speed={this.state.redBoxSpeed / (1000 / deviceFramerate)}
                         size={this.state.redBoxLength}
                         colour={"red"}
                         targetLeft={this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2}
@@ -282,7 +336,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         id={BoxId.Hero}
                         currentFrameDate={this.state.currentFrameDate}
                         lastFrameDate={this.state.lastFrameDate}
-                        speed={10 / (1000 / framerate)}
+                        speed={this.state.blueBoxSpeed / (1000 / deviceFramerate)}
                         size={this.blueBoxLength}
                         colour={"blue"}
                         targetLeft={this.state.blueBoxTargetLocation.left}

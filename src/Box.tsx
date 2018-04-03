@@ -31,7 +31,6 @@ interface Props {
 export type BoxTransforms = Pick<State, "rotation" | "left" | "top">
 
 interface State {
-    speed: number,
     rotation: number,
     hasDefinitelyArrived: boolean,
     left: number,
@@ -50,7 +49,6 @@ export class Box extends Component<Props, State> {
         super(props);
 
         this.state = {
-            speed: this.props.speed,
             rotation: 0,
             hasDefinitelyArrived: true,
             left: this.props.targetLeft,
@@ -94,7 +92,7 @@ export class Box extends Component<Props, State> {
     }
 
     /**
-     * Advance towards the target position. Movement speed is dependent on the time elapsed rather than the framerate,
+     * Advance towards the target position. Movement initialSpeed is dependent on the time elapsed rather than the framerate,
      * so it won't fall short of the expected distance if ever a frame is dropped. This is why date is a required param.
      * If this can be written with some much simpler maths somehow, I'll cry.
      */
@@ -105,8 +103,8 @@ export class Box extends Component<Props, State> {
         const yDiff: number = this.props.targetTop - this.state.top;
 
         const angle: number = Math.atan2(yDiff, xDiff);
-        const maxAdvanceX: number = Math.cos(angle) * (this.state.speed * dateDiff);
-        const maxAdvanceY: number = Math.sin(angle) * (this.state.speed * dateDiff);
+        const maxAdvanceX: number = Math.cos(angle) * (this.props.speed * dateDiff);
+        const maxAdvanceY: number = Math.sin(angle) * (this.props.speed * dateDiff);
 
         this.setState((prevState: Readonly<State>, props: Props) => {
             const left: number = xDiff >= 0 ?
