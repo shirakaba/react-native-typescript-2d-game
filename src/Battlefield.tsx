@@ -50,6 +50,7 @@ const deviceFramerate: number = 60; // TODO: get proper number from device info.
 export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private frameNo: number = 0;
     private blueBoxLength: number = 25;
+    private redBoxInitialLength: number = 50;
     private redBoxSizeLimit: number = 200;
     private batchedState: Partial<BattlefieldState> = {};
     private scaleInterval: number;
@@ -99,7 +100,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 top: 75,
                 rotation: 0
             },
-            redBoxLength: 50,
+            redBoxLength: this.redBoxInitialLength,
             redBoxSpeed: 3,
             blueBoxSpeed: 5,
             blueBoxTransform,
@@ -204,7 +205,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 });
                 break;
             case BoxId.Hero:
-                const stateBatch: Partial<Pick<BattlefieldState, "blueBoxTransform"|"items"|"blueBoxSpeed">> = {
+                const stateBatch: Partial<Pick<BattlefieldState, "blueBoxTransform"|"items"|"blueBoxSpeed"|"redBoxLength">> = {
                     blueBoxTransform: {
                         left,
                         top,
@@ -246,10 +247,12 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                             // TODO: set timer for this item to respawn.
                             break;
                         case ItemType.Shrink:
+                            stateBatch.redBoxLength = Math.max(this.redBoxInitialLength, (this.batchedState.redBoxLength || this.state.redBoxLength) - 50);
                             break;
                         case ItemType.Teleport:
                             break;
                         case ItemType.Mine:
+                            stateBatch.blueBoxSpeed = Math.max(1, (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) - 10);
                             break;
                     }
                 });
@@ -260,7 +263,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 break;
         }
     }
-    
+
     // applySpeedBonusToHero(): void {
     //     this.setState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ speed: prevState.speed + 10 }));
     // }
