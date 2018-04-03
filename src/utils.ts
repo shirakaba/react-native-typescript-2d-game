@@ -56,3 +56,43 @@ export function isColliding(a: Zone, b: Zone): boolean {
 export function hasArrivedAtCoord(target: number, current: number): boolean {
     return Math.abs(target - current) < 0.00001;
 }
+
+export function getRandomInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+/**
+ * Returns a random potentially* unoccupied point, given an allowed zone (e.g. the stage) and a forbidden zone (e.g.
+ * where the character is already standing) and the size of the object that the point is needed for.
+ *
+ * * If the first randomly generated point would collide with the forbidden zone, we offset the point by the width and
+ * height of the forbidden zone, using modulo maths to keep the point within the allowed zone. For tiny stages, this
+ * may still produce a collision. For The Box, whose window is expected to be fullscreen, this shouldn't be a problem.
+ * TODO: perfect this preliminary algorithm.
+ *
+ * @param {Zone} allowedZone
+ * @param {Zone} forbiddenZone
+ * @param {Size} objectSize
+ * @returns {Point}
+ */
+export function getPotentiallyUnoccupiedPoint(allowedZone: Zone, forbiddenZone: Zone, objectSize: Size): Point {
+    const allowedZoneRespectingObjectSize: Size = {
+        width: allowedZone.width - objectSize.width,
+        height: allowedZone.height - objectSize.height
+    };
+
+    const point: Point = {
+        left: getRandomInt(allowedZone.left, allowedZone.left + allowedZoneRespectingObjectSize.width),
+        top: getRandomInt(allowedZone.top, allowedZone.top + allowedZoneRespectingObjectSize.height)
+    };
+
+    if(isColliding({ ...point, ...objectSize }, forbiddenZone)){
+        return {
+            left: allowedZoneRespectingObjectSize.width % point.left + forbiddenZone.width,
+            top: allowedZoneRespectingObjectSize.height % point.top + forbiddenZone.height
+        }
+    } else {
+        return point;
+    }
+}
