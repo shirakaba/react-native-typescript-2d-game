@@ -267,10 +267,6 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 >
                     <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     { this.state.items.map((item: ItemProps, i: number) => <Item key={i} type={item.type} left={item.left} top={item.top}/>) }
-                    {/*<Item id={0} type={ItemType.Teleport} left={100} top={100}/>*/}
-                    {/*<Item id={1} type={ItemType.Speed} left={250} top={370}/>*/}
-                    {/*<Item id={2} type={ItemType.Mine} left={300} top={210}/>*/}
-                    {/*<Item id={3} type={ItemType.Shrink} left={360} top={800}/>*/}
                     <Box
                         id={BoxId.Villain}
                         currentFrameDate={this.state.currentFrameDate}
