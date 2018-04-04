@@ -87,7 +87,7 @@ export class StateBatcher<Props, State> {
 
         /* DO NOT delete or re-allocate this.batchedState; we can just re-use it as-is (it is up-to-date with the last
          * set state, although it may only contain a subset of the whole state's keys), preventing un-necessary extra
-         * garbage on the heap. */
+         * garbage on the heap. TODO: assess whether the extra diffing required by setState() makes this not worth it. */
         // Object.keys(this.batchedState).forEach((key: string) => delete this.batchedState[key]);
         this.batchedStateCompletionCallbacks.splice(0, this.batchedStateCompletionCallbacks.length);
         this.batchedStateComparativeCallbacks.splice(0, this.batchedStateComparativeCallbacks.length);
