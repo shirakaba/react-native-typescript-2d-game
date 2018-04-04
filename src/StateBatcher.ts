@@ -1,7 +1,9 @@
 type BatchedStateComparativeCallback<Props, State> = (prevState: Readonly<State>, props: Props) => Partial<State>;
 
 /**
- * This class allows a batch of state to be prepared during a frame in order to be set
+ * This class allows a batch of state to be assembled during a frame so that setState(), which prompts a re-render, need
+ * only be called once per frame.
+ * TODO: investigate object pools to further reduce heap load: https://www.html5rocks.com/en/tutorials/speed/static-mem-pools/
  */
 export class StateBatcher<Props, State> {
     public batchedState: Partial<State> = {};
@@ -65,17 +67,12 @@ export class StateBatcher<Props, State> {
     }
 
     public setStateBatch(): void {
-        // We pass refs to each of these values as we'll read from them asynchronously and they will soon be blanked out.
-        const batchedStateComparativeCallbacks = this.batchedStateComparativeCallbacks;
-        const batchedState = this.batchedState;
-        const batchedStateCompletionCallbacks = this.batchedStateCompletionCallbacks;
-
-        if(batchedStateComparativeCallbacks.length > 0){
-            this.invokeBatchedStateComparativeCallbacks(batchedState, batchedStateCompletionCallbacks, batchedStateComparativeCallbacks);
+        if(this.batchedStateComparativeCallbacks.length > 0){
+            this.invokeBatchedStateComparativeCallbacks(this.batchedState, this.batchedStateCompletionCallbacks, this.batchedStateComparativeCallbacks);
         } else {
             this.setState(
-                batchedState as State,
-                this.passOptionalBatchedStateCompletionCallback(batchedStateCompletionCallbacks)
+                this.batchedState as State,
+                this.passOptionalBatchedStateCompletionCallback(this.batchedStateCompletionCallbacks)
             );
         }
 
@@ -83,8 +80,16 @@ export class StateBatcher<Props, State> {
     }
 
     private clearBatch(): void {
-        this.batchedState = {};
-        this.batchedStateCompletionCallbacks = [];
-        this.batchedStateComparativeCallbacks = [];
+        /* Simple, but it's better to re-use the memory that's already been allocated. */
+        // this.batchedState = {};
+        // this.batchedStateCompletionCallbacks = [];
+        // this.batchedStateComparativeCallbacks = [];
+
+        /* DO NOT delete or re-allocate this.batchedState; we can just re-use it as-is (it is up-to-date with the last
+         * set state, although it may only contain a subset of the whole state's keys), preventing un-necessary extra
+         * garbage on the heap. */
+        // Object.keys(this.batchedState).forEach((key: string) => delete this.batchedState[key]);
+        this.batchedStateCompletionCallbacks.splice(0, this.batchedStateCompletionCallbacks.length);
+        this.batchedStateComparativeCallbacks.splice(0, this.batchedStateComparativeCallbacks.length);
     }
 }
