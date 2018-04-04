@@ -18,6 +18,7 @@ import {
 import PropTypes from 'prop-types';
 import {Item, ItemProps, itemLength, ItemType} from "./Item";
 import {DimensionsState} from "../App";
+import {StateBatcher} from "./StateBatcher";
 
 type BattlefieldProps = Props & DimensionsState;
 
@@ -63,9 +64,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private blueBoxLength: number = 25;
     private redBoxInitialLength: number = 50;
     private redBoxSizeLimit: number = 200;
-    private batchedState: Partial<BattlefieldState> = {};
-    private batchedStateComparativeCallbacks: BatchedStateComparativeCallback[] = [];
-    private batchedStateCompletionCallbacks: (()=>void)[] = [];
+    private stateBatcher: StateBatcher<BattlefieldProps, BattlefieldState> = new StateBatcher<BattlefieldProps, BattlefieldState>(this.setState.bind(this));
     private scaleInterval: number;
     private itemRestoreTimeouts: number[] = [];
     private itemRestoreTime: milliseconds = 3000;
@@ -131,35 +130,11 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private beginTimedEvents(): void {
         this.scaleInterval = setInterval(() => {
             if(this.state.redBoxLength === this.redBoxSizeLimit) clearInterval(this.scaleInterval);
-            this.batchState({
+            this.stateBatcher.batchState({
                 redBoxLength: this.state.redBoxLength + 1
             });
         }, 200);
     }
-
-    /**
-     * Instead of setting the Battlefield state any time state is lifted up to it or it has its own state to change, we
-     * prepare batches of state to be set only upon each frame update. This is hugely beneficial for performance.
-     * You can see for yourself by replacing all usages of batchState() with direct setState() calls!
-     * @param {Partial<BattlefieldState>} state
-     * @param callback
-     */
-    private batchState(
-        state: Partial<BattlefieldState> | BatchedStateComparativeCallback,
-        callback?: () => void
-    ): void {
-        if(typeof state === "function"){
-            this.batchedStateComparativeCallbacks.push(state);
-        } else {
-            Object.assign(this.batchedState, state);
-        }
-
-        if(callback) this.batchedStateCompletionCallbacks.push(callback);
-    }
-
-    // private batchState(state: (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => void): void {
-    //     // Object.assign(this.batchedState, state);
-    // }
 
     /**
      * Called each frame of the game loop.
@@ -169,17 +144,23 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private update(): void {
         this.frameNo++;
 
-        this.batchedState.lastFrameDate = this.state.currentFrameDate;
-        this.batchedState.currentFrameDate = Date.now();
+        this.stateBatcher.batchState(
+            (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => (
+                {
+                    lastFrameDate: prevState.currentFrameDate,
+                    currentFrameDate: Date.now()
+                }
+            )
+        );
 
-        if(this.batchedState.redBoxTransform || this.batchedState.blueBoxTransform){
-            const redBoxTransform: Point = this.batchedState.redBoxTransform || this.state.redBoxTransform;
-            const redBoxLength: number = this.batchedState.redBoxLength || this.state.redBoxLength;
-            const blueBoxTransform: Point = this.batchedState.blueBoxTransform || this.state.blueBoxTransform;
+        if(this.stateBatcher.batchedState.redBoxTransform || this.stateBatcher.batchedState.blueBoxTransform){
+            const redBoxTransform: Point = this.stateBatcher.batchedState.redBoxTransform || this.state.redBoxTransform;
+            const redBoxLength: number = this.stateBatcher.batchedState.redBoxLength || this.state.redBoxLength;
+            const blueBoxTransform: Point = this.stateBatcher.batchedState.blueBoxTransform || this.state.blueBoxTransform;
 
             /* The batchedState is not guaranteed to have all fields populated each update, so we default to the latest
              * known Battlefield state in each case. */
-            this.batchState({
+            this.stateBatcher.batchState({
                 colliding: isColliding(
                     {
                         ...redBoxTransform,
@@ -195,50 +176,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             });
         }
 
-        // We pass refs to each of these values as we'll read from them asynchronously and they will soon be blanked out.
-        const batchedStateComparativeCallbacks = this.batchedStateComparativeCallbacks;
-        const batchedState = this.batchedState;
-        const batchedStateCompletionCallbacks = this.batchedStateCompletionCallbacks;
-
-        if(batchedStateComparativeCallbacks.length > 0){
-            this.invokeBatchedStateComparativeCallbacks(batchedState, batchedStateCompletionCallbacks, batchedStateComparativeCallbacks);
-        } else {
-            this.setState(
-                batchedState as BattlefieldState,
-                this.passOptionalBatchedStateCompletionCallback(batchedStateCompletionCallbacks)
-            );
-        }
-
-        this.batchedState = {};
-        this.batchedStateCompletionCallbacks = [];
-        this.batchedStateComparativeCallbacks = [];
+        this.stateBatcher.setStateBatch();
     };
-
-    private invokeBatchedStateComparativeCallbacks(
-        batchedState: Partial<BattlefieldState>,
-        batchedStateCompletionCallbacks: (()=>void)[],
-        batchedStateComparativeCallbacks: BatchedStateComparativeCallback[]
-    ): void {
-        this.setState(
-            (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => {
-                return batchedStateComparativeCallbacks
-                .reduce(
-                    (acc: Partial<BattlefieldState>, batchCb: BatchedStateComparativeCallback, i: number, arr: BatchedStateComparativeCallback[]) => {
-                        return Object.assign(acc, batchCb.call(this, Object.assign(prevState, acc), props));
-                    },
-                    batchedState as BattlefieldState
-                );
-            },
-            this.passOptionalBatchedStateCompletionCallback(batchedStateCompletionCallbacks)
-        );
-    }
-
-    private passOptionalBatchedStateCompletionCallback(batchedStateCompletionCallbacks: (()=>void)[]): undefined|(()=>void) {
-        if(batchedStateCompletionCallbacks.length === 0) return undefined;
-        return () => {
-            batchedStateCompletionCallbacks.forEach((callback: () => void) => callback());
-        };
-    }
 
     /**
      * Any tasks that may have side-effects (e.g. setState()) are recommended to be done here rather than in constructor:
@@ -267,7 +206,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     onPositionUpdate(id: BoxId, left: number, top: number, rotation: number): void {
         switch(id){
             case BoxId.Villain:
-                this.batchState({
+                this.stateBatcher.batchState({
                     redBoxTransform: {
                         left,
                         top,
@@ -284,7 +223,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     }
                 };
 
-                (this.batchedState.items || this.state.items)
+                (this.stateBatcher.batchedState.items || this.state.items)
                 .forEach((item: ItemProps, i: number, items: ItemProps[]) => {
                     // This is an obvious use case for filter(), but we use forEach() to keep the index into the unfiltered array.
                     if(items[i].consumed) return;
@@ -314,26 +253,26 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     switch(item.type){
                         case ItemType.Speed:
                             // TODO: limit this so that the blue box can't travel further than his body length in one frame (otherwise he'll skip through items)
-                            // stateBatch.blueBoxSpeed = (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) + 10;
-                            this.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed: prevState.blueBoxSpeed + 10 }));
+                            // stateBatch.blueBoxSpeed = (this.stateBatcher.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) + 10;
+                            this.stateBatcher.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed: prevState.blueBoxSpeed + 10 }));
                             break;
                         case ItemType.Shrink:
-                            // stateBatch.redBoxLength = Math.max(this.redBoxInitialLength, (this.batchedState.redBoxLength || this.state.redBoxLength) - 50);
-                            this.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ redBoxLength:  Math.max(this.redBoxInitialLength, prevState.redBoxLength - 100) }));
+                            // stateBatch.redBoxLength = Math.max(this.redBoxInitialLength, (this.stateBatcher.batchedState.redBoxLength || this.state.redBoxLength) - 50);
+                            this.stateBatcher.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ redBoxLength:  Math.max(this.redBoxInitialLength, prevState.redBoxLength - 100) }));
                             break;
                         case ItemType.Teleport:
                             // TODO: implement.
                             break;
                         case ItemType.Mine:
-                            // stateBatch.blueBoxSpeed = Math.max(1, (this.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) - 10);
-                            this.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed:  Math.max(1, prevState.blueBoxSpeed - 10) }));
+                            // stateBatch.blueBoxSpeed = Math.max(1, (this.stateBatcher.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) - 10);
+                            this.stateBatcher.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed:  Math.max(1, prevState.blueBoxSpeed - 10) }));
                             break;
                     }
 
                     this.restoreItem(i);
                 });
 
-                this.batchState(stateBatch);
+                this.stateBatcher.batchState(stateBatch);
                 break;
             default:
                 break;
@@ -344,7 +283,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private restoreItem(index: number): void {
         this.itemRestoreTimeouts[index] = setTimeout(
             () => {
-                const items: ItemProps[] = JSON.parse(JSON.stringify((this.batchedState.items || this.state.items)));
+                const items: ItemProps[] = JSON.parse(JSON.stringify((this.stateBatcher.batchedState.items || this.state.items)));
                 items[index].consumed = false;
 
                 const point: Point = getPotentiallyUnoccupiedPoint(
@@ -369,7 +308,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 items[index].left = point.left;
                 items[index].top = point.top;
 
-                this.batchState({
+                this.stateBatcher.batchState({
                     items
                 });
             },
@@ -399,7 +338,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
      * The distance of advance each frame is dependent on time elapsed, and so will compensate if frames are dropped.
      */
     updateBlueBoxTarget(left: number, top: number): void {
-        this.batchState({
+        this.stateBatcher.batchState({
             blueBoxTargetLocation: {
                 left: left - this.blueBoxLength/2,
                 top: top - this.blueBoxLength/2
