@@ -128,12 +128,17 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     }
 
     private beginTimedEvents(): void {
-        this.scaleInterval = setInterval(() => {
-            if(this.state.redBoxLength === this.redBoxSizeLimit) clearInterval(this.scaleInterval);
-            this.stateBatcher.batchState({
-                redBoxLength: this.state.redBoxLength + 1
-            });
-        }, 200);
+        this.scaleInterval = setInterval(
+            () => {
+                if(this.state.redBoxLength === this.redBoxSizeLimit) return;
+                this.stateBatcher.batchState(
+                    (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({
+                        redBoxLength: prevState.redBoxLength + 1
+                    })
+                );
+            },
+            200
+        );
     }
 
     /**
@@ -244,7 +249,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     );
 
                     if(!isConsumed) return;
-                    console.log(`Consumed item[${i}]; type ${item.type}!`);
+                    // console.log(`Consumed item[${i}]; type ${item.type}!`);
 
                     // We only deep copy the items once we identify that we have to.
                     if(typeof stateBatch.items === "undefined") stateBatch.items = JSON.parse(JSON.stringify(items));
@@ -374,6 +379,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     onResponderGrant={this.onResponderGrant.bind(this)}
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
+                    { /* TODO: Give the Text component a shouldComponentUpdate() clause, and investigate making these components into PureComponents.
+                       * TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
                     <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
                     { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
                     <Box
