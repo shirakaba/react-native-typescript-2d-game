@@ -19,6 +19,7 @@ This repository aims to reproduce The Box using modern mobile technologies. It's
 - [x] AI: Blue box follows the red box  
 - [x] GAMEPLAY: Basic rectangle-based collision detection  
 - [x] GRAPHICAL: Boxes rotate in the direction of movement 
+- [x] GRAPHICAL: Runs at 60fps (both JS and UI thread) on both iOS Simulator and iPhone 5S
 - [x] OPTIMISATION: Game's state update is synced with the screen refresh via a bespoke-made StateBatcher
 - [x] OPTIMISATION: Eliminate slowdown upon addition of extra components into tree (via `shouldComponentUpdate()`)
 - [x] GAMEPLAY: Add items
@@ -29,6 +30,7 @@ To-do:
 - [ ] ARCHITECTURE: integrate Redux to manage state
 - [ ] GAMEPLAY: Make the game end, and display a score (for time lived) upon collision
 - [ ] GAMEPLAY: Separating Axis Theorem-based collision detection
+- [ ] OPTIMISATION: Investigate using [object pools](https://www.html5rocks.com/en/tutorials/speed/static-mem-pools/) to reduce heap load (as iOS simulator's garbage collection is noticeable)
 - [ ] OPTIMISATION: Convert graphics from being React Native Views to being canvas layers (or similar)
 - [ ] OPTIMISATION: Use React Native's [Animated](https://facebook.github.io/react-native/docs/animated.html) library, as by [Wix](https://github.com/wix-incubator/rn-perf-experiments2/blob/master/src/AnimatedScrollView.js), to reduce '[crossing the bridge](https://www.youtube.com/watch?v=OmiXlJ4ZzAo)'
 
