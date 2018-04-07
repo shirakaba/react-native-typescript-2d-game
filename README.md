@@ -100,3 +100,22 @@ Once the app is running, simply click anywhere on the screen to command the blue
 #### Troubleshooting
 
 Refer to [How I created this project: Troubleshooting](https://github.com/shirakaba/react-native-typescript-2d-game/wiki/How-I-created-this-project#Troubleshooting)
+
+## Licences
+
+### Sounds
+
+All sounds gratefully sourced from [Taira Komori](http://taira-komori.jpn.org/freesounden.html).
+
+Terms of use [here](http://taira-komori.jpn.org/freesounden.html). In brief: "free of charge and royalty free in your projects... be it for commercial or non-commercial purposes".
+
+| Direct download  | Webpage |
+| ------------- | ------------- |
+| [attack1.mp3](http://taira-komori.jpn.org/sound_os/attack01/attack1.mp3)  | [Martial Arts > SF](http://taira-komori.jpn.org/attack01en.html)  |
+| [attack2.mp3](http://taira-komori.jpn.org/sound_os/attack01/attack2.mp3)  | [Martial Arts > SF](http://taira-komori.jpn.org/attack01en.html)  |
+| [bomb.mp3](http://taira-komori.jpn.org/sound_os/arms01/bomb.mp3)  | [Arms Explosion > Explosion,Launcher](http://taira-komori.jpn.org/arms01en.html)  |
+| [explosion1.mp3](http://taira-komori.jpn.org/sound_os/arms01/explosion1.mp3)  | [Arms Explosion > Explosion,Launcher](http://taira-komori.jpn.org/arms01en.html)  |
+| [swing1.mp3](http://taira-komori.jpn.org/sound_os/attack01/swing1.mp3)  | [Martial Arts > Swinging](http://taira-komori.jpn.org/attack01en.html)  |
+| [swing3.mp3](http://taira-komori.jpn.org/sound_os/attack01/swing1.mp3)  | [Martial Arts > Swinging](http://taira-komori.jpn.org/attack01en.html)  |
+
+He also makes these available on [freesound](https://freesound.org/people/Taira%20Komori/) under a [Attribution 3.0 Unported (CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/) licence.
