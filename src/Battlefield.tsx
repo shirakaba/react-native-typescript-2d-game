@@ -256,6 +256,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     if(typeof stateBatch.items === "undefined") stateBatch.items = JSON.parse(JSON.stringify(items));
                     stateBatch.items[i].consumed = true;
 
+                    Item.playSound(item.type).catch((e: any) => console.error(e));
                     switch(item.type){
                         case ItemType.Speed:
                             // TODO: limit this so that the blue box can't travel further than his body length in one frame (otherwise he'll skip through items)
