@@ -103,6 +103,24 @@ Refer to [How I created this project: Troubleshooting](https://github.com/shirak
 
 ## Licences
 
+This project itself is GPL-licensed (see [LICENSE.txt](LICENSE.txt)).
+
+### Dependencies
+
+It is unlikely I'll be able to keep this table up-to-date, but assume either MIT or BSD licence if unsure.
+
+| Dependency  | Licence |
+| ------------- | ------------- |
+| [react-game-kit](https://github.com/FormidableLabs/react-game-kit)  | [MIT](https://github.com/FormidableLabs/react-game-kit/blob/master/LICENSE.md)  |
+| [react-native](https://github.com/facebook/react-native)  | [MIT](https://github.com/facebook/react-native/blob/master/LICENSE)  |
+| [react](https://github.com/facebook/react)  | [MIT](https://github.com/facebook/react/blob/master/LICENSE)  |
+| [prop-types](https://github.com/facebook/prop-types)  | [MIT](https://github.com/facebook/prop-types/blob/master/LICENSE)  |
+| [expo](https://github.com/expo/expo)  | [BSD](https://github.com/expo/expo/blob/master/LICENSE)  |
+
+### Images
+
+Images drawn by my brother for the original The Box game over a decade ago. Used with permission 🤡
+
 ### Sounds
 
 All sounds gratefully sourced from [Taira Komori](http://taira-komori.jpn.org/freesounden.html).
