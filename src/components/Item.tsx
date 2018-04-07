@@ -45,10 +45,10 @@ interface ItemSoundObjs {
 }
 
 export const itemImageObjs: ItemImageObjs = {
-    SPEED: { source: require("../assets/items/speed.png") },
-    SHRINK: { source: require("../assets/items/shrink.png") },
-    TELEPORT: { source: require("../assets/items/teleport.png") },
-    MINE: { source: require("../assets/items/mine.png") },
+    SPEED: { source: require("../../assets/items/speed.png") },
+    SHRINK: { source: require("../../assets/items/shrink.png") },
+    TELEPORT: { source: require("../../assets/items/teleport.png") },
+    MINE: { source: require("../../assets/items/mine.png") },
 };
 
 export const itemSoundObjs: ItemSoundObjs = {
