@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import {Item, ItemProps, itemLength, ItemType} from "./Item";
 import {DimensionsState} from "../App";
 import {StateBatcher} from "./StateBatcher";
+import {CollisionText} from "./CollisionText";
 
 type BattlefieldProps = Props & DimensionsState;
 
@@ -379,9 +380,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     onResponderGrant={this.onResponderGrant.bind(this)}
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
-                    { /* TODO: Give the Text component a shouldComponentUpdate() clause, and investigate making these components into PureComponents.
-                       * TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
-                    <Text style={[styles.collisionIndicator, dynamicCollisionIndicatorStyle]}>{this.state.colliding ? "COLLIDING!" : "SAFE!"}</Text>
+                    { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
+                    <CollisionText colliding={this.state.colliding}/>
                     { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
                     <Box
                         id={BoxId.Villain}
