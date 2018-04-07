@@ -3,7 +3,7 @@
 
 import React, { Component } from 'react';
 import {
-    View, StyleSheet, ImageBackground, Image
+    StyleSheet, Image, ImageRequireSource
 } from 'react-native';
 import {ComponentStyle, getRandomInt, StyleObject, Zone} from "./utils";
 
@@ -33,11 +33,13 @@ export class Item extends Component<ItemProps, State> {
     // TODO: Find out why static values don't work in a React component. May be due to PropTypes.
     // private static size: number = 10;
     private readonly colour: string;
+    private readonly img: ImageRequireSource;
 
     constructor(props: ItemProps) {
         super(props);
 
         this.colour = Item.mapItemTypeToColour(props.type);
+        this.img = Item.mapItemTypeToImage(props.type);
 
         this.state = {
             consumed: false
@@ -54,6 +56,7 @@ export class Item extends Component<ItemProps, State> {
     shouldComponentUpdate(nextProps: Readonly<ItemProps>, nextState: Readonly<State>, nextContext: any): boolean {
         // Visual props
         // if(nextProps === this.props) return false;
+        // Items will never change type during their lifecycle.
         if(this.props.left !== nextProps.left) return true;
         if(this.props.top !== nextProps.top) return true;
         if(this.props.consumed !== nextProps.consumed) return true;
@@ -62,6 +65,22 @@ export class Item extends Component<ItemProps, State> {
         // if(this.state.consumed !== nextState.consumed) return true;
 
         return false;
+    }
+
+    static mapItemTypeToImage(type: ItemType): ImageRequireSource {
+        switch(type){
+            case ItemType.Speed:
+                return require("../assets/items/speed.png");
+            case ItemType.Shrink:
+                return require("../assets/items/shrink.png");
+            case ItemType.Teleport:
+                // TODO: animate
+                return require("../assets/items/teleport.png");
+            case ItemType.Mine:
+                return require("../assets/items/mine.png");
+            default:
+                return require("../assets/items/speed.png");
+        }
     }
 
     static mapItemTypeToColour(type: ItemType): string {
@@ -97,7 +116,7 @@ export class Item extends Component<ItemProps, State> {
 
         return (
             <Image
-                source={require("../assets/items/speed.png")}
+                source={this.img}
                 style={[styles.static, dynamicStyle]}
             />
         );
