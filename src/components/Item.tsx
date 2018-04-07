@@ -8,7 +8,7 @@ import {
 import {PlaybackStatus} from 'expo';
 import {ComponentStyle, StyleObject } from "../utils/utils";
 import {SoundObj, SoundObjs} from "../utils/Sounds";
-import {ImageObj} from "../utils/Images";
+import {ImageObj, ImageObjs} from "../utils/Images";
 
 export enum ItemType {
     Speed,
@@ -30,14 +30,14 @@ interface State {
 }
 
 // TODO: There must be a less redundant way to write these, but mapped types don't support enums, so I'm out of ideas.
-interface ItemImageObjs {
+interface ItemImageObjs extends ImageObjs {
     SPEED: ImageObj;
     SHRINK: ImageObj;
     TELEPORT: ImageObj;
     MINE: ImageObj;
 }
 
-interface ItemSoundObjs {
+interface ItemSoundObjs extends SoundObjs {
     SPEED: SoundObj;
     SHRINK: SoundObj;
     TELEPORT: SoundObj;
@@ -139,7 +139,6 @@ export class Item extends Component<ItemProps, State> {
                 // Licence on freesound: https://creativecommons.org/licenses/by/3.0/ (Attribution 3.0 Unported (CC BY 3.0))
                 // Attribution on Taira Komori's own website: "Please consider giving me a credit or linking back to me"
                 // Terms of Use: "free of charge and royalty free in your projects... be it for commercial or non-commercial purposes"
-                // return itemSoundObjs[Item.mapItemTypeToSoundKey(type)].obj.playAsync();
                 return itemSoundObjs.SPEED.obj.playAsync();
             case ItemType.Shrink:
                 // Taira Komori again:
