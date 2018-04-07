@@ -3,7 +3,7 @@
 
 import React, {PureComponent} from 'react';
 import { StyleSheet, Text } from 'react-native';
-import {ComponentStyle, StyleObject } from "../utils";
+import {ComponentStyle, StyleObject } from "../utils/utils";
 
 interface Props {
     colliding: boolean

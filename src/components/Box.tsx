@@ -6,7 +6,7 @@ import {
     View, StyleSheet, ViewStyle, TextStyle, ImageStyle
 } from 'react-native';
 import PropTypes from 'prop-types';
-import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "../utils";
+import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "../utils/utils";
 
 export const enum BoxId {
     Hero,

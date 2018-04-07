@@ -14,11 +14,11 @@ import {
     Size,
     StyleObject,
     Zone
-} from "../utils";
+} from "../utils/utils";
 import PropTypes from 'prop-types';
 import {Item, ItemProps, itemLength, ItemType} from "./Item";
 import {DimensionsState} from "../../App";
-import {StateBatcher} from "../StateBatcher";
+import {StateBatcher} from "../utils/StateBatcher";
 import {CollisionText} from "./CollisionText";
 
 type BattlefieldProps = Props & DimensionsState;
