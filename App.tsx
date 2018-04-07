@@ -2,12 +2,12 @@
 // Licensed under GPL; find at repo root, in LICENSE.txt.
 
 import React from 'react';
-import {GameLoop} from "./src/GameLoop";
+import {GameLoop} from "./src/components/GameLoop";
 import {Dimensions, ScaledSize} from "react-native";
 import {loadSoundObjects} from "./src/assetLoading/Sounds";
 import {cacheImages} from "./src/assetLoading/Images";
 import {AppLoading} from "expo";
-import {itemImageObjs, itemSoundObjs} from "./src/Item";
+import {itemImageObjs, itemSoundObjs} from "./src/components/Item";
 
 type AppState = State & DimensionsState;
 

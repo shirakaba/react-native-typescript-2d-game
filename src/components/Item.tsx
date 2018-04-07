@@ -6,9 +6,9 @@ import {
     StyleSheet, Image, ImageRequireSource
 } from 'react-native';
 import {PlaybackStatus} from 'expo';
-import {ComponentStyle, StyleObject } from "./utils";
-import {SoundObj, SoundObjs} from "./assetLoading/Sounds";
-import {ImageObj} from "./assetLoading/Images";
+import {ComponentStyle, StyleObject } from "../utils";
+import {SoundObj, SoundObjs} from "../assetLoading/Sounds";
+import {ImageObj} from "../assetLoading/Images";
 
 export enum ItemType {
     Speed,
@@ -52,10 +52,10 @@ export const itemImageObjs: ItemImageObjs = {
 };
 
 export const itemSoundObjs: ItemSoundObjs = {
-    SPEED: { source: require("../assets/sounds/swing1.mp3") },
-    SHRINK: { source: require("../assets/sounds/swing3.mp3") },
-    TELEPORT: { source: require("../assets/sounds/attack2.mp3") },
-    MINE: { source: require("../assets/sounds/explosion1.mp3") },
+    SPEED: { source: require("../../assets/sounds/swing1.mp3") },
+    SHRINK: { source: require("../../assets/sounds/swing3.mp3") },
+    TELEPORT: { source: require("../../assets/sounds/attack2.mp3") },
+    MINE: { source: require("../../assets/sounds/explosion1.mp3") },
 };
 
 // TODO: Figure out how to rewrite as class static.

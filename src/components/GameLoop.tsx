@@ -4,7 +4,7 @@
 import React, {Component} from 'react';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Battlefield} from "./Battlefield";
-import {DimensionsState} from "../App";
+import {DimensionsState} from "../../App";
 
 type GameLoopProps = Props & DimensionsState;
 
