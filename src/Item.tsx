@@ -3,7 +3,7 @@
 
 import React, { Component } from 'react';
 import {
-    View, StyleSheet
+    View, StyleSheet, ImageBackground, Image
 } from 'react-native';
 import {ComponentStyle, getRandomInt, StyleObject, Zone} from "./utils";
 
@@ -27,7 +27,7 @@ interface State {
 }
 
 // TODO: Figure out how to rewrite as class static.
-export const itemLength: number = 10;
+export const itemLength: number = 20;
 
 export class Item extends Component<ItemProps, State> {
     // TODO: Find out why static values don't work in a React component. May be due to PropTypes.
@@ -85,7 +85,7 @@ export class Item extends Component<ItemProps, State> {
      */
     render() {
         const dynamicStyle: Partial<ComponentStyle> = {
-            backgroundColor: this.colour,
+            // backgroundColor: this.colour,
             width: itemLength,
             height: itemLength,
             transform: [
@@ -96,7 +96,8 @@ export class Item extends Component<ItemProps, State> {
         };
 
         return (
-            <View
+            <Image
+                source={require("../assets/items/speed.png")}
                 style={[styles.static, dynamicStyle]}
             />
         );
@@ -105,9 +106,9 @@ export class Item extends Component<ItemProps, State> {
 
 const styles: StyleObject = StyleSheet.create<StyleObject>({
     static: {
-        borderColor: "black",
-        borderStyle: "solid",
-        borderWidth: 1,
-        position: "absolute"
+        // borderColor: "black",
+        // borderStyle: "solid",
+        // borderWidth: 1,
+        position: "absolute",
     }
 });
