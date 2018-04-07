@@ -12,6 +12,11 @@
         "sdkVersion": "25.0.0"
     },
     "ios": {
-        "supportsTablet": true
+        "supportsTablet": true,
+        "splash": {
+            "image": "./assets/icons/loading.png",
+            "resizeMode": "cover",
+            "backgroundColor": "#000000"
+        }
     }
 }

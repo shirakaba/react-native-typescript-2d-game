@@ -4,11 +4,17 @@
 import React from 'react';
 import {GameLoop} from "./src/GameLoop";
 import {Dimensions, ScaledSize} from "react-native";
+import {loadSoundObjects} from "./src/Sounds";
+import {cacheImages} from "./src/Images";
+import {AppLoading} from "expo";
+import {itemImageObjs, itemSoundObjs} from "./src/Item";
 
 type AppState = State & DimensionsState;
 
 interface Props {}
-interface State {}
+interface State {
+    loaded: boolean;
+}
 
 export interface DimensionsState {
     portrait: boolean;
@@ -33,6 +39,7 @@ export default class App extends React.Component<Props, AppState> {
         const windowDimensions: ScaledSize = Dimensions.get("window");
 
         this.state = {
+            loaded: false,
             portrait: windowDimensions.height > windowDimensions.width,
             windowDimensions,
             screenDimensions: Dimensions.get("screen")
@@ -56,7 +63,32 @@ export default class App extends React.Component<Props, AppState> {
         );
     }
 
+    private loadAssets(): Promise<void | [void, void, {}]> {
+        return Promise.all([
+            loadSoundObjects(itemSoundObjs),
+            cacheImages(Object.keys(itemImageObjs).map((key: string) => itemImageObjs[key].source)),
+            // new Promise((resolve, reject) => {
+            //     console.log("Delaying chain to inspect loading screen...");
+            //     window.setTimeout(() => resolve(), 10000);
+            // })
+        ])
+        .then(() => {
+            console.log("All assets loaded successfully!");
+        })
+    }
+
+
     render() {
+        if (!this.state.loaded) {
+            return (
+                <AppLoading
+                    startAsync={this.loadAssets.bind(this)}
+                    onFinish={() => this.setState({ loaded: true })}
+                    onError={console.warn}
+                />
+            );
+        }
+
         return (
             <GameLoop portrait={this.state.portrait} screenDimensions={this.state.screenDimensions} windowDimensions={this.state.windowDimensions}/>
         );

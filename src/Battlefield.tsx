@@ -261,7 +261,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         case ItemType.Speed:
                             // TODO: limit this so that the blue box can't travel further than his body length in one frame (otherwise he'll skip through items)
                             // stateBatch.blueBoxSpeed = (this.stateBatcher.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) + 10;
-                            this.stateBatcher.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed: prevState.blueBoxSpeed + 10 }));
+                            this.stateBatcher.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed: prevState.blueBoxSpeed + 5 }));
                             break;
                         case ItemType.Shrink:
                             // stateBatch.redBoxLength = Math.max(this.redBoxInitialLength, (this.stateBatcher.batchedState.redBoxLength || this.state.redBoxLength) - 50);
@@ -272,7 +272,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                             break;
                         case ItemType.Mine:
                             // stateBatch.blueBoxSpeed = Math.max(1, (this.stateBatcher.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) - 10);
-                            this.stateBatcher.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed:  Math.max(1, prevState.blueBoxSpeed - 10) }));
+                            this.stateBatcher.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ blueBoxSpeed:  Math.max(1, prevState.blueBoxSpeed - 3) }));
                             break;
                     }
 

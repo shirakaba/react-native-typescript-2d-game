@@ -5,9 +5,10 @@ import React, { Component } from 'react';
 import {
     StyleSheet, Image, ImageRequireSource
 } from 'react-native';
-import {Constants, Audio, PlaybackStatus, RequireSource} from 'expo';
+import {PlaybackStatus} from 'expo';
 import {ComponentStyle, StyleObject } from "./utils";
-import {SoundObjs, soundObjs} from "./Sounds";
+import {SoundObj, SoundObjs} from "./Sounds";
+import {ImageObj} from "./Images";
 
 export enum ItemType {
     Speed,
@@ -27,6 +28,35 @@ export interface ItemProps {
 interface State {
     // consumed: boolean
 }
+
+// TODO: There must be a less redundant way to write these, but mapped types don't support enums, so I'm out of ideas.
+interface ItemImageObjs {
+    SPEED: ImageObj;
+    SHRINK: ImageObj;
+    TELEPORT: ImageObj;
+    MINE: ImageObj;
+}
+
+interface ItemSoundObjs {
+    SPEED: SoundObj;
+    SHRINK: SoundObj;
+    TELEPORT: SoundObj;
+    MINE: SoundObj;
+}
+
+export const itemImageObjs: ItemImageObjs = {
+    SPEED: { source: require("../assets/items/speed.png") },
+    SHRINK: { source: require("../assets/items/shrink.png") },
+    TELEPORT: { source: require("../assets/items/teleport.png") },
+    MINE: { source: require("../assets/items/mine.png") },
+};
+
+export const itemSoundObjs: ItemSoundObjs = {
+    SPEED: { source: require("../assets/sounds/swing1.mp3") },
+    SHRINK: { source: require("../assets/sounds/swing3.mp3") },
+    TELEPORT: { source: require("../assets/sounds/attack2.mp3") },
+    MINE: { source: require("../assets/sounds/explosion1.mp3") },
+};
 
 // TODO: Figure out how to rewrite as class static.
 export const itemLength: number = 20;
@@ -72,16 +102,16 @@ export class Item extends Component<ItemProps, State> {
     static mapItemTypeToImage(type: ItemType): ImageRequireSource {
         switch(type){
             case ItemType.Speed:
-                return require("../assets/items/speed.png");
+                return itemImageObjs.SPEED.source;
             case ItemType.Shrink:
-                return require("../assets/items/shrink.png");
+                return itemImageObjs.SHRINK.source;
             case ItemType.Teleport:
                 // TODO: animate
-                return require("../assets/items/teleport.png");
+                return itemImageObjs.TELEPORT.source;
             case ItemType.Mine:
-                return require("../assets/items/mine.png");
+                return itemImageObjs.MINE.source;
             default:
-                return require("../assets/items/speed.png");
+                return itemImageObjs.SPEED.source;
         }
     }
 
@@ -100,7 +130,7 @@ export class Item extends Component<ItemProps, State> {
         }
     }
 
-    static mapItemTypeToSoundKey(type: ItemType): keyof SoundObjs {
+    static playSound(type: ItemType): Promise<PlaybackStatus> {
         switch(type){
             case ItemType.Speed:
                 // By Taira Komori, of: http://taira-komori.jpn.org/freesounden.html
@@ -109,17 +139,18 @@ export class Item extends Component<ItemProps, State> {
                 // Licence on freesound: https://creativecommons.org/licenses/by/3.0/ (Attribution 3.0 Unported (CC BY 3.0))
                 // Attribution on Taira Komori's own website: "Please consider giving me a credit or linking back to me"
                 // Terms of Use: "free of charge and royalty free in your projects... be it for commercial or non-commercial purposes"
-                return "SPEED_SOUND";
+                // return itemSoundObjs[Item.mapItemTypeToSoundKey(type)].obj.playAsync();
+                return itemSoundObjs.SPEED.obj.playAsync();
             case ItemType.Shrink:
                 // Taira Komori again:
                 // http://taira-komori.jpn.org/attack01en.html
                 // http://taira-komori.jpn.org/sound_os/attack01/swing3.mp3
-                return "SHRINK_SOUND";
+                return itemSoundObjs.SHRINK.obj.playAsync();
             case ItemType.Teleport:
                 // Taira Komori again:
                 // http://taira-komori.jpn.org/attack01en.html
                 // http://taira-komori.jpn.org/sound_os/attack01/attack2.mp3
-                return "TELEPORT_SOUND";
+                return itemSoundObjs.TELEPORT.obj.playAsync();
             case ItemType.Mine:
                 // Taira Komori again:
                 // http://taira-komori.jpn.org/attack01en.html
@@ -127,14 +158,10 @@ export class Item extends Component<ItemProps, State> {
                 // http://taira-komori.jpn.org/sound_os/attack01/attack1.mp3
                 // http://taira-komori.jpn.org/sound_os/arms01/bomb.mp3
                 // http://taira-komori.jpn.org/sound_os/arms01/explosion1.mp3
-                return "MINE_SOUND";
+                return itemSoundObjs.MINE.obj.playAsync();
             default:
-                return "SPEED_SOUND";
+                return itemSoundObjs.SPEED.obj.playAsync();
         }
-    }
-
-    static playSound(type: ItemType): Promise<PlaybackStatus> {
-        return soundObjs[Item.mapItemTypeToSoundKey(type)].obj.playAsync();
     }
 
     /**
