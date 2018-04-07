@@ -4,8 +4,8 @@
 import React from 'react';
 import {GameLoop} from "./src/GameLoop";
 import {Dimensions, ScaledSize} from "react-native";
-import {loadSoundObjects} from "./src/Sounds";
-import {cacheImages} from "./src/Images";
+import {loadSoundObjects} from "./src/assetLoading/Sounds";
+import {cacheImages} from "./src/assetLoading/Images";
 import {AppLoading} from "expo";
 import {itemImageObjs, itemSoundObjs} from "./src/Item";
 

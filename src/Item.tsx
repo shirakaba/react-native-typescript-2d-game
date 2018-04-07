@@ -7,8 +7,8 @@ import {
 } from 'react-native';
 import {PlaybackStatus} from 'expo';
 import {ComponentStyle, StyleObject } from "./utils";
-import {SoundObj, SoundObjs} from "./Sounds";
-import {ImageObj} from "./Images";
+import {SoundObj, SoundObjs} from "./assetLoading/Sounds";
+import {ImageObj} from "./assetLoading/Images";
 
 export enum ItemType {
     Speed,
