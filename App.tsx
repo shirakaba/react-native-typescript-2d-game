@@ -12,10 +12,16 @@ import {RootNavigator} from './src/components/screens/RootNavigation';
 import {StyleObject} from "./src/utils/utils";
 
 type AppState = State & DimensionsState;
+type AppProps = Props & StatusBarProps;
 
 interface Props {}
 interface State {
     loaded: boolean;
+    statusBarHidden: boolean;
+}
+
+export interface StatusBarProps {
+    onStatusBarVisibilityChange: (visible: boolean) => void;
 }
 
 export interface DimensionsState {
@@ -41,6 +47,7 @@ export default class App extends React.Component<Props, AppState> {
         const windowDimensions: ScaledSize = Dimensions.get("window");
 
         this.state = {
+            statusBarHidden: false,
             loaded: false,
             portrait: windowDimensions.height > windowDimensions.width,
             windowDimensions,
@@ -93,8 +100,13 @@ export default class App extends React.Component<Props, AppState> {
 
         return (
             <View style={styles.container}>
-                {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-                <RootNavigator portrait={this.state.portrait} screenDimensions={this.state.screenDimensions} windowDimensions={this.state.windowDimensions}/>
+                {Platform.OS === 'ios' && <StatusBar barStyle="default" hidden={this.state.statusBarHidden} />}
+                <RootNavigator
+                    portrait={this.state.portrait}
+                    screenDimensions={this.state.screenDimensions}
+                    windowDimensions={this.state.windowDimensions}
+                    onStatusBarVisibilityChange={(visible: boolean) => this.setState({ statusBarHidden: !visible })}
+                />
             </View>
 
 

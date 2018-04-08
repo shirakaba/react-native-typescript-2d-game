@@ -6,8 +6,10 @@ import { Loop, Stage } from 'react-game-kit/native';
 import {Button, StyleSheet, Text, View} from "react-native";
 import {StyleObject} from "../../utils/utils";
 import {NavigationNavigatorProps} from "react-navigation";
+import {NavigationNavigatorPropsNarrowed, ScreenProps} from "./RootNavigation";
 
-type LandingProps = Props & NavigationNavigatorProps;
+type LandingProps = Props & NavigationNavigatorPropsNarrowed;
+// type LandingProps = Props & ScreenProps;
 
 interface Props {
 }
@@ -17,6 +19,11 @@ interface State {
 export class Landing extends Component<LandingProps, State> {
     constructor(props: LandingProps) {
         super(props);
+
+    }
+
+    componentDidMount(): void {
+        this.props.screenProps.onStatusBarVisibilityChange(true);
     }
 
     render() {

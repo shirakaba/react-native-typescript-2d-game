@@ -1,11 +1,17 @@
 import React, {Component} from 'react';
-import {NavigationContainer, StackNavigator, StackNavigatorConfig} from 'react-navigation';
+import {NavigationContainer, NavigationNavigatorProps, StackNavigator, StackNavigatorConfig} from 'react-navigation';
 
-import {DimensionsState} from "../../../App";
+import {DimensionsState, StatusBarProps} from "../../../App";
 import {GameLoop} from "./GameLoop";
 import {Landing} from "./Landing";
 
-type RootNavigatorProps = Props & DimensionsState;
+export type ScreenProps = DimensionsState & StatusBarProps;
+type RootNavigatorProps = Props & ScreenProps;
+
+// Have to provide this because react-navigation's types for screenProps are lazy.
+export interface NavigationNavigatorPropsNarrowed extends NavigationNavigatorProps {
+    screenProps?: ScreenProps;
+}
 
 interface Props {
 }

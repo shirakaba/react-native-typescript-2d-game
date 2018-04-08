@@ -4,9 +4,9 @@
 import React, {Component} from 'react';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Battlefield} from "../Battlefield";
-import {NavigationScreenProps} from "./RootNavigation";
+import {NavigationNavigatorPropsNarrowed} from "./RootNavigation";
 
-type GameLoopProps = Props & NavigationScreenProps;
+type GameLoopProps = Props & NavigationNavigatorPropsNarrowed;
 
 interface Props {
 }
@@ -21,6 +21,10 @@ interface State {
 export class GameLoop extends Component<GameLoopProps, State> {
     constructor(props: GameLoopProps) {
         super(props);
+    }
+
+    componentDidMount(): void {
+        this.props.screenProps.onStatusBarVisibilityChange(false);
     }
 
     render() {
