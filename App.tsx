@@ -106,6 +106,6 @@ export default class App extends React.Component<Props, AppState> {
 const styles: StyleObject = StyleSheet.create<StyleObject>({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
     },
 });

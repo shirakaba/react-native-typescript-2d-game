@@ -3,14 +3,16 @@ import {NavigationContainer, StackNavigator, StackNavigatorConfig} from 'react-n
 
 import {DimensionsState} from "../../App";
 import {GameLoop} from "./GameLoop";
+import {Landing} from "./Landing";
 
 type RootNavigatorProps = Props & DimensionsState;
 
-export interface NavigationScreenProps {
-    // The only way that react-navigation can pass props.
-    // From: https://github.com/react-navigation/react-navigation/issues/876#issuecomment-302945124
-    screenProps: DimensionsState;
-}
+// export interface NavigationScreenProps {
+//     // The only way that react-navigation can pass props because initialRouteParams just seems to be ignored.
+//     // From: https://github.com/react-navigation/react-navigation/issues/876#issuecomment-302945124
+//     screenProps: DimensionsState;
+//     navigation:
+// }
 
 interface Props {
 }
@@ -31,31 +33,39 @@ export class RootNavigator extends Component<RootNavigatorProps, State> {
                 Play: {
                     screen: GameLoop,
                 },
+                Landing: {
+                    screen: Landing,
+                },
             },
-            /* This doesn't seem to affect anything... */
-            // {
-            //     navigationOptions:
-            //         ({ navigation, navigationOptions, screenProps }) => {
-            //             return {
-            //                 headerTitleStyle: {
-            //                     fontWeight: 'normal',
-            //                 },
-            //                 initialRouteName: "Play",
-            //                 initialRouteParams: {
-            //                     ...this.props
-            //                 }
-            //             };
-            //         },
-            // }
+            {
+                headerMode: "none", // To remove the UINavigationBar altogether. Alternatively: "float"|"screen"
+                cardStyle: {
+                    // The background colour that the navigator should show if its given screen has any transparency.
+                    backgroundColor: "#DDDDDD"
+                },
+                initialRouteName: "Landing",
+
+                // initialRouteParams: {
+                //     ...this.props
+                // },
+
+                /* This doesn't seem to affect anything... Maybe is just a callback invoked upon any changes? */
+                // navigationOptions:
+                //     ({ navigation, navigationOptions, screenProps }) => {
+                //         return {
+                //             headerTitleStyle: {
+                //                 fontWeight: 'normal',
+                //             },
+                //             headerMode: "none",
+                //             initialRouteName: "Play",
+                //             // initialRouteParams: {
+                //             //     ...this.props
+                //             // }
+                //         };
+                //     },
+            }
         );
 
-    }
-
-    componentWillMount(): void {
-        console.log("componentWillMount(). props:", this.props);
-    }
-    componentDidMount(): void {
-        console.log("componentDidMount");
     }
 
     render() {
