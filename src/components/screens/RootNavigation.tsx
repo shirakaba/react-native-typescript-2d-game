@@ -28,7 +28,7 @@ export class RootNavigator extends Component<RootNavigatorProps, State> {
         this.RootStackNavigator = StackNavigator(
             {
                 Play: {
-                    screen: GameLoop,
+                    screen: GameLoop
                 },
                 Landing: {
                     screen: Landing,

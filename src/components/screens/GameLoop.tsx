@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Battlefield} from "../Battlefield";
 import {NavigationNavigatorPropsNarrowed} from "./RootNavigation";
+import {NavigationStackScreenOptions} from "react-navigation";
 
 type GameLoopProps = Props & NavigationNavigatorPropsNarrowed;
 
@@ -19,6 +20,10 @@ interface State {
  * This is provided by the <Loop> component at the top of the tree.
  */
 export class GameLoop extends Component<GameLoopProps, State> {
+    public static navigationOptions: NavigationStackScreenOptions = {
+        gesturesEnabled: false,
+    };
+
     constructor(props: GameLoopProps) {
         super(props);
     }
