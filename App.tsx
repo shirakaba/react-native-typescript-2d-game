@@ -3,11 +3,13 @@
 
 import React from 'react';
 import {GameLoop} from "./src/components/GameLoop";
-import {Dimensions, ScaledSize} from "react-native";
+import {Dimensions, Platform, ScaledSize, StatusBar, StyleSheet, View} from "react-native";
 import {loadSoundObjects} from "./src/utils/Sounds";
 import {cacheImages} from "./src/utils/Images";
 import {AppLoading} from "expo";
 import {itemImageObjs, itemSoundObjs} from "./src/components/Item";
+import {RootNavigator} from './src/components/RootNavigation';
+import {StyleObject} from "./src/utils/utils";
 
 type AppState = State & DimensionsState;
 
@@ -90,7 +92,20 @@ export default class App extends React.Component<Props, AppState> {
         }
 
         return (
-            <GameLoop portrait={this.state.portrait} screenDimensions={this.state.screenDimensions} windowDimensions={this.state.windowDimensions}/>
+            <View style={styles.container}>
+                {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+                <RootNavigator portrait={this.state.portrait} screenDimensions={this.state.screenDimensions} windowDimensions={this.state.windowDimensions}/>
+            </View>
+
+
+            // <GameLoop portrait={this.state.portrait} screenDimensions={this.state.screenDimensions} windowDimensions={this.state.windowDimensions}/>
         );
     }
 }
+
+const styles: StyleObject = StyleSheet.create<StyleObject>({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+});

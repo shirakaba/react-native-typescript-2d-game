@@ -4,9 +4,9 @@
 import React, {Component} from 'react';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Battlefield} from "./Battlefield";
-import {DimensionsState} from "../../App";
+import {NavigationScreenProps} from "./RootNavigation";
 
-type GameLoopProps = Props & DimensionsState;
+type GameLoopProps = Props & NavigationScreenProps;
 
 interface Props {
 }
@@ -26,7 +26,7 @@ export class GameLoop extends Component<GameLoopProps, State> {
     render() {
         return (
             <Loop>
-                <Battlefield portrait={this.props.portrait} screenDimensions={this.props.screenDimensions} windowDimensions={this.props.windowDimensions}/>
+                <Battlefield portrait={this.props.screenProps.portrait} screenDimensions={this.props.screenProps.screenDimensions} windowDimensions={this.props.screenProps.windowDimensions}/>
             </Loop>
         );
     }
