@@ -25,6 +25,7 @@ export class Landing extends Component<LandingProps, State> {
             <View
                 style={[styles.mainView]}
             >
+                <Text style={styles.title}>The Box</Text>
                 <Button
                     onPress={() => (this.props.navigation as any).navigate('Play')}
                     title={"PLAY"}
@@ -40,5 +41,8 @@ const styles: StyleObject = StyleSheet.create<StyleObject>({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    title: {
+        fontSize: 32
     }
 });
