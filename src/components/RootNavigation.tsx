@@ -19,8 +19,6 @@ export class RootNavigator extends Component<RootNavigatorProps, State> {
     constructor(props: RootNavigatorProps){
         super(props);
 
-        // console.log(props);
-
         this.RootStackNavigator = StackNavigator(
             {
                 Play: {

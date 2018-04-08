@@ -17,7 +17,6 @@ interface State {
 export class Landing extends Component<LandingProps, State> {
     constructor(props: LandingProps) {
         super(props);
-        console.log(this.props.navigation);
     }
 
     render() {
