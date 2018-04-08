@@ -2,7 +2,7 @@
 // Licensed under GPL; find at repo root, in LICENSE.txt.
 
 import React, {Component} from 'react';
-import {Dimensions, GestureResponderEvent, ScaledSize, StyleSheet, Text, View} from 'react-native';
+import {Dimensions, GestureResponderEvent, Platform, ScaledSize, StyleSheet, Text, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxId, BoxTransforms} from "./Box";
 import {
@@ -298,12 +298,21 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 const items: ItemProps[] = JSON.parse(JSON.stringify((this.stateBatcher.batchedState.items || this.state.items)));
                 items[index].consumed = false;
 
+                const isIphoneX: boolean = Platform.OS === 'ios' && (this.props.screenDimensions.width === 812 || this.props.screenDimensions.height === 812);
+                // https://www.paintcodeapp.com/news/iphone-x-screen-demystified
+                const NOTCH_DEPTH: number = 30;
+                const OPPOSITE_CURVE_DEPTH: number = NOTCH_DEPTH; // Best guess.
+
+                const windowWidth: number = this.props.windowDimensions.width;
+                const windowHeight: number = this.props.windowDimensions.height;
+
                 const point: Point = getPotentiallyUnoccupiedPoint(
                     {
-                        left: 0,
-                        top: 0,
-                        width: this.props.windowDimensions.width,
-                        height: this.props.windowDimensions.height,
+                        // I don't know how to determine whether we're in primary/secondary portrait/landscape mode, so I design as if there's a notch on BOTH sides.
+                        left: isIphoneX ? (this.props.portrait ? 0 : NOTCH_DEPTH) : 0,
+                        top: isIphoneX ? (this.props.portrait ? NOTCH_DEPTH  : 0) : 0,
+                        width: isIphoneX ? (this.props.portrait ? windowWidth : windowWidth - (NOTCH_DEPTH + OPPOSITE_CURVE_DEPTH)) : windowWidth,
+                        height: isIphoneX ? (this.props.portrait ? windowHeight - (NOTCH_DEPTH + OPPOSITE_CURVE_DEPTH) : windowHeight) : windowHeight,
                     },
                     {
                         left: this.state.blueBoxTransform.left,
