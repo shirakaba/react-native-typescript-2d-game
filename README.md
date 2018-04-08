@@ -13,7 +13,9 @@ Around 2006, my brother made a simple Flash game called [The Box](https://birchl
 
 ### This project
 
-This repository aims to reproduce The Box using modern mobile technologies. It's available on the Expo app store [here](https://expo.io/@bottledlogic/the-box). Aspects that are implemented so far:
+This repository aims to reproduce The Box using modern mobile technologies. It's available on the Expo app store [here](https://expo.io/@bottledlogic/the-box).
+
+#### Implemented so far:
 
 - [x] INTERACTIVE: Tap (or drag) to command the blue box where to go
 - [x] AI: Blue box follows the red box  
@@ -23,16 +25,19 @@ This repository aims to reproduce The Box using modern mobile technologies. It's
 - [x] OPTIMISATION: Game's state update is synced with the screen refresh via a bespoke-made StateBatcher
 - [x] OPTIMISATION: Eliminate slowdown upon addition of extra components into tree (via `shouldComponentUpdate()`)
 - [x] GAMEPLAY: Add items
+- [x] UX: Integrate a router to show different screens (e.g. start, options, etc.)
 
-To-do:
+#### To-do:
 
-- [ ] UX: Integrate a router to show different screens (e.g. start, options, etc.)
 - [ ] ARCHITECTURE: integrate Redux to manage state
 - [ ] GAMEPLAY: Make the game end, and display a score (for time lived) upon collision
-- [ ] GAMEPLAY: Separating Axis Theorem-based collision detection
 - [ ] OPTIMISATION: Investigate using [object pools](https://www.html5rocks.com/en/tutorials/speed/static-mem-pools/) to reduce heap load (as iOS simulator's garbage collection is noticeable)
-- [ ] OPTIMISATION: Convert graphics from being React Native Views to being canvas layers (or similar)
-- [ ] OPTIMISATION: Use React Native's [Animated](https://facebook.github.io/react-native/docs/animated.html) library, as by [Wix](https://github.com/wix-incubator/rn-perf-experiments2/blob/master/src/AnimatedScrollView.js), to reduce '[crossing the bridge](https://www.youtube.com/watch?v=OmiXlJ4ZzAo)'
+
+#### Investigated (but ditched):
+- ~~GAMEPLAY: Separating Axis Theorem-based collision detection.~~ Current cheap box-based collision detection works fine because rotation is only an illusion!
+- ~~OPTIMISATION: Convert graphics from being React Native Views to being canvas layers (or similar).~~ Did an experimental canvas implementation but it was much slower than native `View` components and the rotation maths somehow changed.
+- ~~OPTIMISATION: Use React Native's [Animated](https://facebook.github.io/react-native/docs/animated.html) library, as by [Wix](https://github.com/wix-incubator/rn-perf-experiments2/blob/master/src/AnimatedScrollView.js), to reduce '[crossing the bridge](https://www.youtube.com/watch?v=OmiXlJ4ZzAo)'~~ Tested out, but it ran much slower! It seems `Animated` doesn't make sense for repetitive single-frame manual position adjustments. 
+
 
 ## Technologies
 
@@ -116,6 +121,7 @@ It is unlikely I'll be able to keep this table up-to-date, but assume either MIT
 | [react](https://github.com/facebook/react)  | [MIT](https://github.com/facebook/react/blob/master/LICENSE)  |
 | [prop-types](https://github.com/facebook/prop-types)  | [MIT](https://github.com/facebook/prop-types/blob/master/LICENSE)  |
 | [expo](https://github.com/expo/expo)  | [BSD](https://github.com/expo/expo/blob/master/LICENSE)  |
+| [react-navigation](https://github.com/react-navigation/react-navigation)  | [BSD](https://github.com/react-navigation/react-navigation/blob/master/LICENSE)  |
 
 ### Images
 
@@ -137,3 +143,9 @@ Terms of use [here](http://taira-komori.jpn.org/freesounden.html). In brief: "fr
 | [swing3.mp3](http://taira-komori.jpn.org/sound_os/attack01/swing1.mp3)  | [Martial Arts > Swinging](http://taira-komori.jpn.org/attack01en.html)  |
 
 He also makes these available on [freesound](https://freesound.org/people/Taira%20Komori/) under a [Attribution 3.0 Unported (CC BY 3.0)](https://creativecommons.org/licenses/by/3.0/) licence.
+
+## Special thanks
+
+* To [Noitidart Saab](https://github.com/Noitidart) for his published and open-source [FlyThru](https://github.com/Noitidart/FlyThru) React Native app, which gave me hope that React Native could be used for 2D games without a dedicated graphics library; and for his demonstration of how to rig up React Navigation.
+
+* To [Alex Duckmanton](https://github.com/alexduckmanton) who makes another React Native app, Burst, albeit closed-source (for now?) apart from an [animation tutorial](https://github.com/alexduckmanton/burst-animation-guide-complete). A productive [chance conversation](https://www.reddit.com/r/reactnative/comments/889ery/how_i_created_bursts_mind_bending_animations_with/dwj33od/) with him led me to getting items integrated without losing frame rate.
