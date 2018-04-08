@@ -50,9 +50,9 @@ export class Box extends Component<Props, State> {
 
         this.state = {
             rotation: 0,
-            hasDefinitelyArrived: true,
-            left: this.props.targetLeft,
-            top: this.props.targetTop
+            hasDefinitelyArrived: this.props.colour === "blue",
+            left: this.props.targetLeft + (this.props.colour === "red" ? 200 : 0),
+            top: this.props.targetTop + (this.props.colour === "red" ? 200 : 0)
         };
 
         this.advance = this.advance.bind(this);
