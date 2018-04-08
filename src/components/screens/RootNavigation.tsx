@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {NavigationContainer, StackNavigator, StackNavigatorConfig} from 'react-navigation';
 
-import {DimensionsState} from "../../App";
+import {DimensionsState} from "../../../App";
 import {GameLoop} from "./GameLoop";
 import {Landing} from "./Landing";
 

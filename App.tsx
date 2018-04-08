@@ -2,13 +2,13 @@
 // Licensed under GPL; find at repo root, in LICENSE.txt.
 
 import React from 'react';
-import {GameLoop} from "./src/components/GameLoop";
+import {GameLoop} from "./src/components/screens/GameLoop";
 import {Dimensions, Platform, ScaledSize, StatusBar, StyleSheet, View} from "react-native";
 import {loadSoundObjects} from "./src/utils/Sounds";
 import {cacheImages} from "./src/utils/Images";
 import {AppLoading} from "expo";
 import {itemImageObjs, itemSoundObjs} from "./src/components/Item";
-import {RootNavigator} from './src/components/RootNavigation';
+import {RootNavigator} from './src/components/screens/RootNavigation';
 import {StyleObject} from "./src/utils/utils";
 
 type AppState = State & DimensionsState;

@@ -3,7 +3,7 @@
 
 import React, {Component} from 'react';
 import { Loop, Stage } from 'react-game-kit/native';
-import {Battlefield} from "./Battlefield";
+import {Battlefield} from "../Battlefield";
 import {NavigationScreenProps} from "./RootNavigation";
 
 type GameLoopProps = Props & NavigationScreenProps;
