@@ -26,7 +26,11 @@ type BattlefieldProps = Props & DimensionsState;
 interface Props {
 }
 
-type BattlefieldState = BoxStates & CollisionState & TimeState & BattlefieldDimensionsState & ItemStates;
+type BattlefieldState = BoxStates & CollisionState & TimeState & BattlefieldDimensionsState & ItemStates & GameState;
+
+interface GameState {
+    gameOver: boolean
+}
 
 interface BattlefieldDimensionsState {
     stageWidth: number;
@@ -87,6 +91,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         };
 
         this.state = {
+            gameOver: false,
             items: this.mapItemTypesToItemStates(
                 {
                     left: 0,
@@ -335,6 +340,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
 
         // Visual state
         // TODO: tell Battlefield to stop updating upon game-over (which hasn't been implemented yet).
+        // if(this.state.gameOver) return false;
         // Pretty much all the Battlefield's state is visual, so no great saving to be made by doing deep comparisons.
 
         return true;
