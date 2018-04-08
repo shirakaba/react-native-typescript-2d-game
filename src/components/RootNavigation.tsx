@@ -7,13 +7,6 @@ import {Landing} from "./Landing";
 
 type RootNavigatorProps = Props & DimensionsState;
 
-// export interface NavigationScreenProps {
-//     // The only way that react-navigation can pass props because initialRouteParams just seems to be ignored.
-//     // From: https://github.com/react-navigation/react-navigation/issues/876#issuecomment-302945124
-//     screenProps: DimensionsState;
-//     navigation:
-// }
-
 interface Props {
 }
 
@@ -45,11 +38,10 @@ export class RootNavigator extends Component<RootNavigatorProps, State> {
                 },
                 initialRouteName: "Landing",
 
-                // initialRouteParams: {
-                //     ...this.props
-                // },
-
-                /* This doesn't seem to affect anything... Maybe is just a callback invoked upon any changes? */
+                /* This doesn't seem to affect anything... Maybe is just a callback invoked upon any changes?
+                 * Unsure what initialRouteParams is for. I am resigned to pass props via screenProps instead.
+                 * Thanks to: https://github.com/react-navigation/react-navigation/issues/876#issuecomment-302945124
+                 **/
                 // navigationOptions:
                 //     ({ navigation, navigationOptions, screenProps }) => {
                 //         return {
@@ -58,9 +50,9 @@ export class RootNavigator extends Component<RootNavigatorProps, State> {
                 //             },
                 //             headerMode: "none",
                 //             initialRouteName: "Play",
-                //             // initialRouteParams: {
-                //             //     ...this.props
-                //             // }
+                //             initialRouteParams: {
+                //                 ...this.props
+                //             }
                 //         };
                 //     },
             }

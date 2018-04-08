@@ -6,7 +6,6 @@ import { Loop, Stage } from 'react-game-kit/native';
 import {Button, StyleSheet, Text, View} from "react-native";
 import {StyleObject} from "../utils/utils";
 import {NavigationNavigatorProps} from "react-navigation";
-import {DimensionsState} from "../../App";
 
 type LandingProps = Props & NavigationNavigatorProps;
 
