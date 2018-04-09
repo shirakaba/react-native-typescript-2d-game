@@ -20,6 +20,8 @@ import {Item, ItemProps, itemLength, ItemType} from "./Item";
 import {DimensionsState} from "../../App";
 import {StateBatcher} from "../utils/StateBatcher";
 import {CollisionText} from "./CollisionText";
+import {GameOverModal} from './GameOverModal';
+import {Aligner} from "./Aligner";
 
 type BattlefieldProps = Props & DimensionsState;
 
@@ -300,6 +302,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
 
                 const isIphoneX: boolean = Platform.OS === 'ios' && (this.props.screenDimensions.width === 812 || this.props.screenDimensions.height === 812);
                 // https://www.paintcodeapp.com/news/iphone-x-screen-demystified
+                // https://developer.apple.com/ios/human-interface-guidelines/overview/iphone-x/
                 const NOTCH_DEPTH: number = 30;
                 const OPPOSITE_CURVE_DEPTH: number = NOTCH_DEPTH; // Best guess.
 
@@ -341,19 +344,19 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     //     this.setState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ speed: prevState.speed + 10 }));
     // }
 
-    shouldComponentUpdate(nextProps: Readonly<BattlefieldProps>, nextState: Readonly<BattlefieldState>, nextContext: any): boolean {
-        if(nextProps === this.props && nextState === this.state) return false;
-
-        // Visual props
-        if(this.props.windowDimensions !== nextProps.windowDimensions) return true;
-
-        // Visual state
-        // TODO: tell Battlefield to stop updating upon game-over (which hasn't been implemented yet).
-        // if(this.state.gameOver) return false;
-        // Pretty much all the Battlefield's state is visual, so no great saving to be made by doing deep comparisons.
-
-        return true;
-    }
+    // shouldComponentUpdate(nextProps: Readonly<BattlefieldProps>, nextState: Readonly<BattlefieldState>, nextContext: any): boolean {
+    //     if(nextProps === this.props && nextState === this.state) return false;
+    //
+    //     // Visual props
+    //     if(this.props.windowDimensions !== nextProps.windowDimensions) return true;
+    //
+    //     // Visual state
+    //     // TODO: tell Battlefield to stop updating upon game-over (which hasn't been implemented yet).
+    //     // if(this.state.gameOver) return false;
+    //     // Pretty much all the Battlefield's state is visual, so no great saving to be made by doing deep comparisons.
+    //
+    //     return true;
+    // }
 
     /**
      * The blue box will advance towards this target location once per frame at a rate based on its 'speed' prop.
@@ -389,44 +392,52 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         };
 
         return (
-            <View
-                style={styles.container}
-                onStartShouldSetResponder={(ev: GestureResponderEvent) => true}
-                onResponderGrant={this.onResponderGrant.bind(this)}
-                onResponderMove={this.onResponderMove.bind(this)}
-            >
-                { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
-                <CollisionText colliding={this.state.colliding}/>
-                { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
-                <Box
-                    id={BoxId.Villain}
-                    currentFrameDate={this.state.currentFrameDate}
-                    lastFrameDate={this.state.lastFrameDate}
-                    speed={this.state.redBoxSpeed / (1000 / deviceFramerate)}
-                    size={this.state.redBoxLength}
-                    colour={"red"}
-                    targetLeft={this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2}
-                    targetTop={this.state.blueBoxTransform.top + this.blueBoxLength/2 - this.state.redBoxLength/2}
-                    onPositionUpdate={this.onPositionUpdate.bind(this)}
-                />
-                <Box
-                    id={BoxId.Hero}
-                    currentFrameDate={this.state.currentFrameDate}
-                    lastFrameDate={this.state.lastFrameDate}
-                    speed={this.state.blueBoxSpeed / (1000 / deviceFramerate)}
-                    size={this.blueBoxLength}
-                    colour={"blue"}
-                    targetLeft={this.state.blueBoxTargetLocation.left}
-                    targetTop={this.state.blueBoxTargetLocation.top}
-                    onPositionUpdate={this.onPositionUpdate.bind(this)}
-                />
-            </View>
+            // <Aligner>
+                <View
+                    style={styles.container}
+                    onStartShouldSetResponder={(ev: GestureResponderEvent) => true}
+                    onResponderGrant={this.onResponderGrant.bind(this)}
+                    onResponderMove={this.onResponderMove.bind(this)}
+                >
+                    <GameOverModal
+                        modalVisible={this.state.colliding}
+                    />
+                    { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
+                    <CollisionText colliding={this.state.colliding}/>
+                    { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
+                    <Box
+                        id={BoxId.Villain}
+                        currentFrameDate={this.state.currentFrameDate}
+                        lastFrameDate={this.state.lastFrameDate}
+                        speed={this.state.redBoxSpeed / (1000 / deviceFramerate)}
+                        size={this.state.redBoxLength}
+                        colour={"red"}
+                        targetLeft={this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2}
+                        targetTop={this.state.blueBoxTransform.top + this.blueBoxLength/2 - this.state.redBoxLength/2}
+                        onPositionUpdate={this.onPositionUpdate.bind(this)}
+                    />
+                    <Box
+                        id={BoxId.Hero}
+                        currentFrameDate={this.state.currentFrameDate}
+                        lastFrameDate={this.state.lastFrameDate}
+                        speed={this.state.blueBoxSpeed / (1000 / deviceFramerate)}
+                        size={this.blueBoxLength}
+                        colour={"blue"}
+                        targetLeft={this.state.blueBoxTargetLocation.left}
+                        targetTop={this.state.blueBoxTargetLocation.top}
+                        onPositionUpdate={this.onPositionUpdate.bind(this)}
+                    />
+                </View>
+            // </Aligner>
         );
     }
 }
 
 const styles: StyleObject = StyleSheet.create<StyleObject>({
     container: {
+        // flex: 1,
+        // justifyContent: "center",
+        // alignItems: "center",
         position: 'absolute',
         height: "100%",
         width: "100%",

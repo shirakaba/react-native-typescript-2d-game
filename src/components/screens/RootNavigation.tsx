@@ -40,7 +40,7 @@ export class RootNavigator extends Component<RootNavigatorProps, State> {
                     // The background colour that the navigator should show if its given screen has any transparency.
                     backgroundColor: "#DDDDDD"
                 },
-                initialRouteName: "Landing",
+                initialRouteName: "Play",
 
                 /* This doesn't seem to affect anything... Maybe is just a callback invoked upon any changes?
                  * Unsure what initialRouteParams is for. I am resigned to pass props via screenProps instead.

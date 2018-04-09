@@ -24,12 +24,13 @@ export class GameOverModal extends PureComponent<Props, State> {
     }
 
     render() {
+        console.log(`this.state.modalVisible:`, this.state.modalVisible);
         return (
             <Modal
                 // presentationStyle="formSheet"
                 animationType="slide"
                 transparent={true}
-                visible={this.state.modalVisible}
+                visible={this.props.modalVisible}
                 onRequestClose={() => {
                     alert('Modal has been closed.');
                 }}>
@@ -63,7 +64,9 @@ const styles: StyleObject = StyleSheet.create<StyleObject>({
         borderColor: "rgba(0, 0, 0, 0.1)"
     },
     modalContent: {
-        position: "absolute",
+        top: "40%",
+        position: "relative",
+        zIndex: 2,
         backgroundColor: "white",
         padding: 22,
         justifyContent: "center",
