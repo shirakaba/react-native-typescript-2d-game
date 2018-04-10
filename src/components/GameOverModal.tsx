@@ -3,20 +3,59 @@ import {Modal, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} fro
 import {StyleObject} from "../utils/utils";
 
 interface Props {
-    modalVisible: boolean
+    modalVisible: boolean,
+    timeSurvived: number
 }
 
 interface State {
-    modalVisible: boolean
+    modalVisible: boolean,
+    modalCommitted: boolean,
+    timeSurvived: number
 }
 
-export class GameOverModal extends PureComponent<Props, State> {
+export class GameOverModal extends Component<Props, State> {
     constructor(props: Props){
         super(props);
 
         this.state = {
             modalVisible: this.props.modalVisible,
+            modalCommitted: false,
+            timeSurvived: 0
         };
+    }
+
+    componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
+        if(this.state.modalCommitted && this.state.modalVisible){
+            // if(nextProps.)
+            // console.log("MODAL COMMITTED");
+            return
+        } else {
+            if(
+                nextProps.modalVisible !== this.state.modalVisible ||
+                // nextProps.timeSurvived !== this.state.timeSurvived ||
+                this.state.modalCommitted === false
+               ){
+                console.log("MODAL NOT COMMITTED");
+                this.setState({
+                    modalVisible: nextProps.modalVisible,
+                    timeSurvived: nextProps.timeSurvived,
+                    modalCommitted: true
+                });
+            }
+        }
+    }
+
+    shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
+        // if(this.state.modalCommitted && this.props.timeSurvived > this.state.timeSurvived) return false;
+        // if(this.props.timeSurvived > this.state.timeSurvived) return false;
+        // return true;
+        if(nextProps.modalVisible !== this.state.modalVisible){
+            // console.log("SHOULD UPDATE");
+            return true;
+        }
+        // if(this.state.modalVisible) return true;
+        if(this.state.modalCommitted) return false;
+        return false;
     }
 
     setModalVisible(visible) {
@@ -24,7 +63,8 @@ export class GameOverModal extends PureComponent<Props, State> {
     }
 
     render() {
-        console.log(`this.state.modalVisible:`, this.state.modalVisible);
+        // console.log(`this.state.modalVisible:`, this.state.modalVisible);
+        console.log(`this.props.timeSurvived:`, this.props.timeSurvived);
         return (
             <Modal
                 // presentationStyle="formSheet"
@@ -36,7 +76,12 @@ export class GameOverModal extends PureComponent<Props, State> {
                 }}>
                 <View style={styles.modalContent}>
                     <View>
-                        <Text>Hello World!</Text>
+                        <Text style={{
+                            fontSize: 32
+                        }}>Game over!</Text>
+                        <Text style={{
+                            // fontSize: 32
+                        }}>{`You lasted ${(this.state.timeSurvived / 1000).toFixed(0)} seconds`}</Text>
 
                         <TouchableOpacity
                             onPress={() => {

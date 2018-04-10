@@ -31,7 +31,8 @@ interface Props {
 type BattlefieldState = BoxStates & CollisionState & TimeState & BattlefieldDimensionsState & ItemStates & GameState;
 
 interface GameState {
-    gameOver: boolean
+    gameOver: boolean,
+    timeSurvived: number
 }
 
 interface BattlefieldDimensionsState {
@@ -94,6 +95,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
 
         this.state = {
             gameOver: false,
+            timeSurvived: 0,
             items: this.mapItemTypesToItemStates(
                 {
                     left: 0,
@@ -158,12 +160,15 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         this.frameNo++;
 
         this.stateBatcher.batchState(
-            (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => (
-                {
+            (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => {
+                const currentFrameDate: number = Date.now();
+                // console.log(`${prevState.timeSurvived + (prevState.currentFrameDate - prevState.lastFrameDate)}`);
+                return {
+                    currentFrameDate: currentFrameDate,
                     lastFrameDate: prevState.currentFrameDate,
-                    currentFrameDate: Date.now()
+                    timeSurvived: prevState.timeSurvived + (currentFrameDate - prevState.currentFrameDate)
                 }
-            )
+            }
         );
 
         if(this.stateBatcher.batchedState.redBoxTransform || this.stateBatcher.batchedState.blueBoxTransform){
@@ -171,21 +176,24 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             const redBoxLength: number = this.stateBatcher.batchedState.redBoxLength || this.state.redBoxLength;
             const blueBoxTransform: Point = this.stateBatcher.batchedState.blueBoxTransform || this.state.blueBoxTransform;
 
+            const colliding: boolean = isColliding(
+                {
+                    ...redBoxTransform,
+                    width: redBoxLength,
+                    height: redBoxLength
+                },
+                {
+                    ...blueBoxTransform,
+                    width: this.blueBoxLength,
+                    height: this.blueBoxLength
+                }
+            );
+
             /* The batchedState is not guaranteed to have all fields populated each update, so we default to the latest
              * known Battlefield state in each case. */
             this.stateBatcher.batchState({
-                colliding: isColliding(
-                    {
-                        ...redBoxTransform,
-                        width: redBoxLength,
-                        height: redBoxLength
-                    },
-                    {
-                        ...blueBoxTransform,
-                        width: this.blueBoxLength,
-                        height: this.blueBoxLength
-                    }
-                )
+                colliding,
+                gameOver: colliding
             });
         }
 
@@ -400,7 +408,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
                     <GameOverModal
-                        modalVisible={this.state.colliding}
+                        modalVisible={this.state.gameOver} timeSurvived={this.stateBatcher.batchedState.timeSurvived || this.state.timeSurvived}
                     />
                     { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
                     <CollisionText colliding={this.state.colliding}/>
