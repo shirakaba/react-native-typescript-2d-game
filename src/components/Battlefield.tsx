@@ -407,9 +407,6 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     onResponderGrant={this.onResponderGrant.bind(this)}
                     onResponderMove={this.onResponderMove.bind(this)}
                 >
-                    <GameOverModal
-                        modalVisible={this.state.gameOver} timeSurvived={this.stateBatcher.batchedState.timeSurvived || this.state.timeSurvived}
-                    />
                     { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
                     <CollisionText colliding={this.state.colliding}/>
                     { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
@@ -434,6 +431,9 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         targetLeft={this.state.blueBoxTargetLocation.left}
                         targetTop={this.state.blueBoxTargetLocation.top}
                         onPositionUpdate={this.onPositionUpdate.bind(this)}
+                    />
+                    <GameOverModal
+                        modalVisible={this.state.gameOver} timeSurvived={this.stateBatcher.batchedState.timeSurvived || this.state.timeSurvived}
                     />
                 </View>
             // </Aligner>

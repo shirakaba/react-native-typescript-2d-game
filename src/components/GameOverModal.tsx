@@ -3,6 +3,7 @@ import {Modal, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} fro
 import {StyleObject} from "../utils/utils";
 
 interface Props {
+    // deviceHeight: number,
     modalVisible: boolean,
     timeSurvived: number
 }
@@ -65,40 +66,58 @@ export class GameOverModal extends Component<Props, State> {
     render() {
         // console.log(`this.state.modalVisible:`, this.state.modalVisible);
         console.log(`this.props.timeSurvived:`, this.props.timeSurvived);
-        return (
-            <Modal
-                // presentationStyle="formSheet"
-                animationType="slide"
-                transparent={true}
-                visible={this.props.modalVisible}
-                onRequestClose={() => {
-                    alert('Modal has been closed.');
-                }}>
-                <View style={styles.modalContent}>
-                    <View>
-                        <Text style={{
-                            fontSize: 32
-                        }}>Game over!</Text>
-                        <Text style={{
-                            // fontSize: 32
-                        }}>{`You lasted ${(this.state.timeSurvived / 1000).toFixed(0)} seconds`}</Text>
 
-                        <TouchableOpacity
-                            onPress={() => {
-                            this.setModalVisible(!this.state.modalVisible);
-                        }}>
-                            <View style={styles.button}>
-                                <Text>Hide modal</Text>
-                            </View>
-                        </TouchableOpacity>
+        // const middleTop: number =
+
+        return (
+            <View style={styles.modalContainer}>
+                {/*<View style={{flex: 1, height: "100%", width: "100%", backgroundColor: "orange"}}/>*/}
+                <Modal
+                    // presentationStyle="formSheet"
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.props.modalVisible}
+                    onRequestClose={() => {
+                        alert('Modal has been closed.');
+                    }}>
+                    <View style={styles.modalContent}>
+                        <View>
+                            <Text style={{
+                                fontSize: 32
+                            }}>Game over!</Text>
+                            <Text style={{
+                                // fontSize: 32
+                            }}>{`You lasted ${(this.state.timeSurvived / 1000).toFixed(0)} seconds`}</Text>
+
+                            <TouchableOpacity
+                                onPress={() => {
+                                this.setModalVisible(false);
+                            }}>
+                                <View style={styles.button}>
+                                    <Text>Play again</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
-            </Modal>
+                </Modal>
+                {/*<View style={{flex: 1, height: "100%", width: "100%", backgroundColor: "orange"}}/>*/}
+            </View>
         );
     }
 }
 
 const styles: StyleObject = StyleSheet.create<StyleObject>({
+    modalContainer: {
+        // height: "100%",
+        // width: "100%",
+        position: "relative",
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        // zIndex: 2,
+        // backgroundColor: "purple"
+    },
     button: {
         backgroundColor: "lightblue",
         padding: 12,
@@ -110,8 +129,11 @@ const styles: StyleObject = StyleSheet.create<StyleObject>({
     },
     modalContent: {
         top: "40%",
+        // flex: 0.25,
+        // flex: 1,
+        height: 400,
+        // width: "100%",
         position: "relative",
-        zIndex: 2,
         backgroundColor: "white",
         padding: 22,
         justifyContent: "center",
