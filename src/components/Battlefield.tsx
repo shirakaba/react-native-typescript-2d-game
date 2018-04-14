@@ -142,12 +142,22 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
 
     private resetGame(): void {
         console.log("RESET GAME");
-        console.log("startGameState", this.startGameState);
-        this.stateBatcher.batchedState = this.startGameState;
+        const date: Date = new Date();
+        Object.assign(this.startGameState, { lastFrameDate: date, currentFrameDate: date });
+        // this.stateBatcher.batchedState = Object.assign(this.startGameState, { lastFrameDate: date, currentFrameDate: date });
+        this.stateBatcher.batchedState = {};
+        // console.log("startGameState", this.stateBatcher.batchedState);
+        this.stateBatcher.clearBatch();
+
+        console.log(
+            "[resetGame()] this.stateBatcher.batchedState",
+            this.stateBatcher.batchedState
+        );
+
         this.setState(
             this.startGameState,
             () => {
-                console.log(`CALLING BACK WITH STARTGAME(). timeSurvived: ${this.state.timeSurvived}`);
+                // console.log(`CALLING BACK WITH STARTGAME(). timeSurvived: ${this.state.timeSurvived}`);
                 this.startGame();
             }
         );
@@ -168,13 +178,14 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
      * it has been called, then ultimately sets the state, prompting a render. Finally resets the batchedState.
      */
     private update(): void {
-        console.log("UPDATE");
+        // console.log("UPDATE");
         this.frameNo++;
 
         this.stateBatcher.batchState(
             (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => {
                 const currentFrameDate: number = Date.now();
                 // console.log(`${prevState.timeSurvived + (prevState.currentFrameDate - prevState.lastFrameDate)}`);
+                console.log(`prevState.timeSurvived: ${prevState.timeSurvived}`);
                 return {
                     currentFrameDate: currentFrameDate,
                     lastFrameDate: prevState.currentFrameDate,
@@ -184,6 +195,11 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         );
 
         if(this.stateBatcher.batchedState.redBoxTransform || this.stateBatcher.batchedState.blueBoxTransform){
+            console.log(
+                "[update()] this.stateBatcher.batchedState",
+                this.stateBatcher.batchedState
+            );
+
             const redBoxTransform: Point = this.stateBatcher.batchedState.redBoxTransform || this.state.redBoxTransform;
             const redBoxLength: number = this.stateBatcher.batchedState.redBoxLength || this.state.redBoxLength;
             const blueBoxTransform: Point = this.stateBatcher.batchedState.blueBoxTransform || this.state.blueBoxTransform;
@@ -214,7 +230,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     };
 
     private startGame(): void {
-        console.log("START GAME");
+        console.log("START GAME. state:", this.state);
+        // The moment we subscribe to the loop again, we see the GAME OVER message, because update() runs and somehow box positions haven't yet been reset.
         this.loopID = this.context.loop.subscribe(this.update);
         this.beginTimedEvents();
     }
@@ -439,6 +456,11 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             color: this.state.colliding ? "red" : "green"
         };
 
+        const blueCentredTargetLeft: number = this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2;
+        const blueCentredTargetTop: number = this.state.blueBoxTransform.top + this.blueBoxLength/2 - this.state.redBoxLength/2;
+
+        console.log("RENDERING. TIMESURVIVED:", this.state.timeSurvived);
+
         return (
             <View
                 style={styles.container}
@@ -456,9 +478,12 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     speed={this.state.redBoxSpeed / (1000 / deviceFramerate)}
                     size={this.state.redBoxLength}
                     colour={"red"}
-                    targetLeft={this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2}
-                    targetTop={this.state.blueBoxTransform.top + this.blueBoxLength/2 - this.state.redBoxLength/2}
+                    left={this.state.timeSurvived < 1000 ? (this.state.redBoxTransform.left) : null}
+                    top={this.state.timeSurvived < 1000 ? (this.state.redBoxTransform.top) : null}
+                    targetLeft={blueCentredTargetLeft}
+                    targetTop={blueCentredTargetTop}
                     onPositionUpdate={this.onPositionUpdate.bind(this)}
+                    gameOver={this.state.gameOver}
                 />
                 <Box
                     id={BoxId.Hero}
@@ -467,9 +492,12 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     speed={this.state.blueBoxSpeed / (1000 / deviceFramerate)}
                     size={this.blueBoxLength}
                     colour={"blue"}
+                    left={this.state.timeSurvived < 1000 ? this.state.blueBoxTransform.left : null}
+                    top={this.state.timeSurvived < 1000 ? this.state.blueBoxTransform.top : null}
                     targetLeft={this.state.blueBoxTargetLocation.left}
                     targetTop={this.state.blueBoxTargetLocation.top}
                     onPositionUpdate={this.onPositionUpdate.bind(this)}
+                    gameOver={this.state.gameOver}
                 />
                 <GameOverModal
                     modalVisible={this.state.gameOver}

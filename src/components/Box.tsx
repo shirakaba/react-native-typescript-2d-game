@@ -14,10 +14,12 @@ export const enum BoxId {
 }
 
 interface Props {
+    gameOver: boolean,
     // Used to calculate how far we have to move (our speed is based on time, not framerate)
     lastFrameDate: number,
     currentFrameDate: number,
-
+    left: number|null,
+    top: number|null,
     // date: number,
     id: BoxId,
     speed: number,
@@ -41,6 +43,7 @@ interface State {
 export const radToDeg: number = 180/Math.PI;
 
 export class Box extends Component<Props, State> {
+    private loopID: number|null;
     static contextTypes = {
         loop: PropTypes.object,
     };
@@ -50,9 +53,16 @@ export class Box extends Component<Props, State> {
 
         this.state = {
             rotation: 0,
-            hasDefinitelyArrived: this.props.colour === "blue",
-            left: this.props.targetLeft + (this.props.colour === "red" ? 200 : 0),
-            top: this.props.targetTop + (this.props.colour === "red" ? 200 : 0)
+            // hasDefinitelyArrived: this.props.colour === "blue",
+            hasDefinitelyArrived:
+                (this.props.left !== null && this.props.top !== null) ?
+                    hasArrivedAtCoord(this.props.left, this.props.targetLeft) && hasArrivedAtCoord(this.props.top, this.props.targetTop) :
+                    this.props.colour === "blue"
+            ,
+            // left: this.props.targetLeft + (this.props.colour === "red" ? 200 : 0),
+            left: this.props.left === null ? (this.props.targetLeft + (this.props.colour === "red" ? 200 : 0)) : this.props.left,
+            // top: this.props.targetTop + (this.props.colour === "red" ? 200 : 0)
+            top: this.props.top === null ? (this.props.targetTop + (this.props.colour === "red" ? 200 : 0)) : this.props.top
         };
 
         this.advance = this.advance.bind(this);
@@ -65,9 +75,15 @@ export class Box extends Component<Props, State> {
     }
 
     componentWillReceiveProps(nextProps: Props): void {
-        this.setState({
-            hasDefinitelyArrived: hasArrivedAtCoord(nextProps.targetTop, this.state.top) && hasArrivedAtCoord(nextProps.targetLeft, this.state.left)
-        });
+        if(nextProps.gameOver){
+            this.context.loop.unsubscribe(this.loopID);
+            this.loopID = null;
+        } else {
+            if(this.loopID === null) this.loopID = this.context.loop.subscribe(this.update);
+            this.setState({
+                hasDefinitelyArrived: hasArrivedAtCoord(nextProps.targetTop, this.state.top) && hasArrivedAtCoord(nextProps.targetLeft, this.state.left)
+            });
+        }
     }
 
     /**
@@ -84,11 +100,11 @@ export class Box extends Component<Props, State> {
     };
 
     componentDidMount(): void {
-        this.context.loop.subscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
+        this.loopID = this.context.loop.subscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
     }
 
     componentWillUnmount(): void {
-        this.context.loop.unsubscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
+        this.context.loop.unsubscribe(this.loopID); // See react-game-kit for (limited) documentation. Not a Promise.
     }
 
     /**
@@ -174,8 +190,8 @@ export class Box extends Component<Props, State> {
             width: this.props.size,
             height: this.props.size,
             transform: [
-                { translateX: this.state.left },
-                { translateY: this.state.top },
+                { translateX: this.props.left === null ? this.state.left : this.props.left },
+                { translateY: this.props.top === null ? this.state.top : this.props.top },
                 { rotate: `${this.state.rotation}deg` }
             ]
         };
