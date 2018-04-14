@@ -6,7 +6,8 @@ import {StyleObject} from "../utils/utils";
 interface Props {
     // deviceHeight: number,
     modalVisible: boolean,
-    timeSurvived: number
+    timeSurvived: number,
+    resetGame: () => void
 }
 
 interface State {
@@ -55,6 +56,9 @@ export class GameOverModal extends Component<Props, State> {
             // console.log("SHOULD UPDATE");
             return true;
         }
+        if(nextState.modalVisible !== this.state.modalVisible){
+            return true;
+        }
         // if(this.state.modalVisible) return true;
         if(this.state.modalCommitted) return false;
         return false;
@@ -71,8 +75,11 @@ export class GameOverModal extends Component<Props, State> {
         return (
             <Modal
                 animationIn="slideInUp"
-                isVisible={this.props.modalVisible}
-                onModalHide={() => {}}
+                isVisible={this.state.modalVisible}
+                onModalHide={() => {
+                    console.log("ON MODAL HIDE");
+                    this.props.resetGame();
+                }}
                 onModalShow={() => {}}
                 // supportedOrientations={['portrait', 'landscape']}
                 >
@@ -87,8 +94,9 @@ export class GameOverModal extends Component<Props, State> {
 
                         <TouchableOpacity
                             onPress={() => {
-                            this.setModalVisible(false);
-                        }}>
+                                this.setModalVisible(false);
+                            }}
+                        >
                             <View style={styles.button}>
                                 <Text>Play again</Text>
                             </View>

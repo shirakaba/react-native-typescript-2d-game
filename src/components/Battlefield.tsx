@@ -139,6 +139,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     }
 
     private resetGame(): void {
+        console.log("RESET GAME");
         this.setState(this.startGameState);
     }
 
@@ -437,7 +438,9 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     onPositionUpdate={this.onPositionUpdate.bind(this)}
                 />
                 <GameOverModal
-                    modalVisible={this.state.gameOver} timeSurvived={this.stateBatcher.batchedState.timeSurvived || this.state.timeSurvived}
+                    modalVisible={this.state.gameOver}
+                    timeSurvived={this.stateBatcher.batchedState.timeSurvived || this.state.timeSurvived}
+                    resetGame={this.resetGame.bind(this)}
                 />
             </View>
         );
