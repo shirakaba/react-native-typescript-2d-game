@@ -76,6 +76,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private scaleInterval: number;
     private itemRestoreTimeouts: number[] = [];
     private itemRestoreTime: milliseconds = 3000;
+    private startGameState: BattlefieldState;
 
     static contextTypes = {
         loop: PropTypes.object,
@@ -93,7 +94,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             rotation: 0
         };
 
-        this.state = {
+        this.state = this.startGameState = {
             gameOver: false,
             timeSurvived: 0,
             items: this.mapItemTypesToItemStates(
@@ -135,6 +136,10 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         };
 
         this.update = this.update.bind(this);
+    }
+
+    private resetGame(): void {
+        this.setState(this.startGameState);
     }
 
     private beginTimedEvents(): void {
@@ -400,43 +405,41 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         };
 
         return (
-            // <Aligner>
-                <View
-                    style={styles.container}
-                    onStartShouldSetResponder={(ev: GestureResponderEvent) => true}
-                    onResponderGrant={this.onResponderGrant.bind(this)}
-                    onResponderMove={this.onResponderMove.bind(this)}
-                >
-                    { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
-                    <CollisionText colliding={this.state.colliding}/>
-                    { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
-                    <Box
-                        id={BoxId.Villain}
-                        currentFrameDate={this.state.currentFrameDate}
-                        lastFrameDate={this.state.lastFrameDate}
-                        speed={this.state.redBoxSpeed / (1000 / deviceFramerate)}
-                        size={this.state.redBoxLength}
-                        colour={"red"}
-                        targetLeft={this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2}
-                        targetTop={this.state.blueBoxTransform.top + this.blueBoxLength/2 - this.state.redBoxLength/2}
-                        onPositionUpdate={this.onPositionUpdate.bind(this)}
-                    />
-                    <Box
-                        id={BoxId.Hero}
-                        currentFrameDate={this.state.currentFrameDate}
-                        lastFrameDate={this.state.lastFrameDate}
-                        speed={this.state.blueBoxSpeed / (1000 / deviceFramerate)}
-                        size={this.blueBoxLength}
-                        colour={"blue"}
-                        targetLeft={this.state.blueBoxTargetLocation.left}
-                        targetTop={this.state.blueBoxTargetLocation.top}
-                        onPositionUpdate={this.onPositionUpdate.bind(this)}
-                    />
-                    <GameOverModal
-                        modalVisible={this.state.gameOver} timeSurvived={this.stateBatcher.batchedState.timeSurvived || this.state.timeSurvived}
-                    />
-                </View>
-            // </Aligner>
+            <View
+                style={styles.container}
+                onStartShouldSetResponder={(ev: GestureResponderEvent) => true}
+                onResponderGrant={this.onResponderGrant.bind(this)}
+                onResponderMove={this.onResponderMove.bind(this)}
+            >
+                { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
+                <CollisionText colliding={this.state.colliding}/>
+                { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
+                <Box
+                    id={BoxId.Villain}
+                    currentFrameDate={this.state.currentFrameDate}
+                    lastFrameDate={this.state.lastFrameDate}
+                    speed={this.state.redBoxSpeed / (1000 / deviceFramerate)}
+                    size={this.state.redBoxLength}
+                    colour={"red"}
+                    targetLeft={this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2}
+                    targetTop={this.state.blueBoxTransform.top + this.blueBoxLength/2 - this.state.redBoxLength/2}
+                    onPositionUpdate={this.onPositionUpdate.bind(this)}
+                />
+                <Box
+                    id={BoxId.Hero}
+                    currentFrameDate={this.state.currentFrameDate}
+                    lastFrameDate={this.state.lastFrameDate}
+                    speed={this.state.blueBoxSpeed / (1000 / deviceFramerate)}
+                    size={this.blueBoxLength}
+                    colour={"blue"}
+                    targetLeft={this.state.blueBoxTargetLocation.left}
+                    targetTop={this.state.blueBoxTargetLocation.top}
+                    onPositionUpdate={this.onPositionUpdate.bind(this)}
+                />
+                <GameOverModal
+                    modalVisible={this.state.gameOver} timeSurvived={this.stateBatcher.batchedState.timeSurvived || this.state.timeSurvived}
+                />
+            </View>
         );
     }
 }

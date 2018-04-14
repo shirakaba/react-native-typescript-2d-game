@@ -86,7 +86,6 @@ export default class App extends React.Component<Props, AppState> {
         })
     }
 
-
     render() {
         if (!this.state.loaded) {
             return (
@@ -108,9 +107,6 @@ export default class App extends React.Component<Props, AppState> {
                     onStatusBarVisibilityChange={(visible: boolean) => this.setState({ statusBarHidden: !visible })}
                 />
             </View>
-
-
-            // <GameLoop portrait={this.state.portrait} screenDimensions={this.state.screenDimensions} windowDimensions={this.state.windowDimensions}/>
         );
     }
 }
