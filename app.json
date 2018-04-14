@@ -5,11 +5,11 @@
         "slug": "the-box",
         "githubUrl": "https://github.com/shirakaba/react-native-typescript-2d-game",
         "privacy": "public",
-        "version": "1.4.2",
+        "version": "1.5.0",
         "orientation": "portrait",
         "primaryColor": "#fd9408",
         "icon": "./assets/icons/icon.png",
-        "sdkVersion": "25.0.0"
+        "sdkVersion": "26.0.0"
     },
     "ios": {
         "supportsTablet": true,
