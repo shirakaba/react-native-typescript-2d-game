@@ -43,7 +43,8 @@ interface State {
 export const radToDeg: number = 180/Math.PI;
 
 export class Box extends Component<Props, State> {
-    private loopID: number|null;
+    private loopID: number|null = null;
+
     static contextTypes = {
         loop: PropTypes.object,
     };
@@ -81,7 +82,9 @@ export class Box extends Component<Props, State> {
         } else {
             if(this.loopID === null) this.loopID = this.context.loop.subscribe(this.update);
             this.setState({
-                hasDefinitelyArrived: hasArrivedAtCoord(nextProps.targetTop, this.state.top) && hasArrivedAtCoord(nextProps.targetLeft, this.state.left)
+                hasDefinitelyArrived: hasArrivedAtCoord(nextProps.targetTop, this.state.top) && hasArrivedAtCoord(nextProps.targetLeft, this.state.left),
+                left: nextProps.left === null ? this.state.left : nextProps.left,
+                top: nextProps.top === null ? this.state.top : nextProps.top,
             });
         }
     }
@@ -95,7 +98,7 @@ export class Box extends Component<Props, State> {
         if(this.state.hasDefinitelyArrived){
             return;
         } else {
-            this.advance(this.props.currentFrameDate);
+            if(!this.props.gameOver) this.advance(this.props.currentFrameDate);
         }
     };
 
@@ -190,8 +193,10 @@ export class Box extends Component<Props, State> {
             width: this.props.size,
             height: this.props.size,
             transform: [
-                { translateX: this.props.left === null ? this.state.left : this.props.left },
-                { translateY: this.props.top === null ? this.state.top : this.props.top },
+                // { translateX: this.props.left === null ? this.state.left : this.props.left },
+                // { translateY: this.props.top === null ? this.state.top : this.props.top },
+                { translateX: this.state.left },
+                { translateY: this.state.top },
                 { rotate: `${this.state.rotation}deg` }
             ]
         };
