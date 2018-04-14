@@ -74,7 +74,10 @@ export class GameOverModal extends Component<Props, State> {
 
         return (
             <Modal
-                animationIn="slideInUp"
+                // animationIn="slideInUp"
+                // animationIn="zoomInDown"
+                // animationIn="swing"
+                animationIn="shake"
                 isVisible={this.state.modalVisible}
                 onModalHide={() => {
                     console.log("ON MODAL HIDE");
@@ -89,8 +92,8 @@ export class GameOverModal extends Component<Props, State> {
                             fontSize: 32
                         }}>Game over!</Text>
                         <Text style={{
-                            // fontSize: 32
-                        }}>{`You lasted ${(this.state.timeSurvived / 1000).toFixed(0)} seconds`}</Text>
+                            textAlign: "center"
+                        }}>{`You lasted ${(this.state.timeSurvived / 1000).toFixed(1)} seconds.`}</Text>
 
                         <TouchableOpacity
                             onPress={() => {

@@ -193,8 +193,6 @@ export class Box extends Component<Props, State> {
             width: this.props.size,
             height: this.props.size,
             transform: [
-                // { translateX: this.props.left === null ? this.state.left : this.props.left },
-                // { translateY: this.props.top === null ? this.state.top : this.props.top },
                 { translateX: this.state.left },
                 { translateY: this.state.top },
                 { rotate: `${this.state.rotation}deg` }
