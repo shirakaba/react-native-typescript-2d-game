@@ -3,9 +3,9 @@
 
 import React, { Component } from 'react';
 import {
-    StyleSheet, Image, ImageRequireSource
+    StyleSheet, Image, ImageRequireSource, View
 } from 'react-native';
-import {PlaybackStatus} from 'expo';
+import {Constants, PlaybackStatus} from 'expo';
 import {ComponentStyle, StyleObject } from "../utils/utils";
 import {SoundObj, SoundObjs} from "../utils/Sounds";
 import {ImageObj, ImageObjs} from "../utils/Images";
@@ -169,7 +169,6 @@ export class Item extends Component<ItemProps, State> {
      */
     render() {
         const dynamicStyle: Partial<ComponentStyle> = {
-            // backgroundColor: this.colour,
             width: itemLength,
             height: itemLength,
             transform: [
@@ -180,10 +179,18 @@ export class Item extends Component<ItemProps, State> {
         };
 
         return (
-            <Image
-                source={this.img}
-                style={[styles.static, dynamicStyle]}
-            />
+            Constants.isDevice ?
+            (
+                <Image
+                    source={this.img}
+                    style={[styles.static, dynamicStyle]}
+                />
+            ) :
+            (
+                <View
+                    style={[styles.static, dynamicStyle, { backgroundColor: this.colour }]}
+                />
+            )
         );
     }
 }
