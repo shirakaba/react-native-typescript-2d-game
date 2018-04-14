@@ -1,5 +1,6 @@
 import React, {Component, PureComponent} from 'react';
-import {Modal, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
+import Modal from 'react-native-modal';
 import {StyleObject} from "../utils/utils";
 
 interface Props {
@@ -67,57 +68,39 @@ export class GameOverModal extends Component<Props, State> {
         // console.log(`this.state.modalVisible:`, this.state.modalVisible);
         console.log(`this.props.timeSurvived:`, this.props.timeSurvived);
 
-        // const middleTop: number =
-
         return (
-            <View style={styles.modalContainer}>
-                {/*<View style={{flex: 1, height: "100%", width: "100%", backgroundColor: "orange"}}/>*/}
-                <Modal
-                    // presentationStyle="formSheet"
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.props.modalVisible}
-                    onRequestClose={() => {
-                        alert('Modal has been closed.');
-                    }}>
-                    <View style={styles.modalContent}>
-                        <View>
-                            <Text style={{
-                                fontSize: 32
-                            }}>Game over!</Text>
-                            <Text style={{
-                                // fontSize: 32
-                            }}>{`You lasted ${(this.state.timeSurvived / 1000).toFixed(0)} seconds`}</Text>
+            <Modal
+                animationIn="slideInUp"
+                isVisible={this.props.modalVisible}
+                onModalHide={() => {}}
+                onModalShow={() => {}}
+                // supportedOrientations={['portrait', 'landscape']}
+                >
+                <View style={styles.modalContent}>
+                    <View>
+                        <Text style={{
+                            fontSize: 32
+                        }}>Game over!</Text>
+                        <Text style={{
+                            // fontSize: 32
+                        }}>{`You lasted ${(this.state.timeSurvived / 1000).toFixed(0)} seconds`}</Text>
 
-                            <TouchableOpacity
-                                onPress={() => {
-                                this.setModalVisible(false);
-                            }}>
-                                <View style={styles.button}>
-                                    <Text>Play again</Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity
+                            onPress={() => {
+                            this.setModalVisible(false);
+                        }}>
+                            <View style={styles.button}>
+                                <Text>Play again</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
-                </Modal>
-                {/*<View style={{flex: 1, height: "100%", width: "100%", backgroundColor: "orange"}}/>*/}
-            </View>
+                </View>
+            </Modal>
         );
     }
 }
 
 const styles: StyleObject = StyleSheet.create<StyleObject>({
-    modalContainer: {
-        // height: "100%",
-        // width: "100%",
-        position: "relative",
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        // zIndex: 2,
-        // backgroundColor: "purple"
-    },
     button: {
         backgroundColor: "lightblue",
         padding: 12,
@@ -128,11 +111,6 @@ const styles: StyleObject = StyleSheet.create<StyleObject>({
         borderColor: "rgba(0, 0, 0, 0.1)"
     },
     modalContent: {
-        top: "40%",
-        // flex: 0.25,
-        // flex: 1,
-        height: 400,
-        // width: "100%",
         position: "relative",
         backgroundColor: "white",
         padding: 22,
@@ -140,9 +118,5 @@ const styles: StyleObject = StyleSheet.create<StyleObject>({
         alignItems: "center",
         borderRadius: 4,
         borderColor: "rgba(0, 0, 0, 0.1)"
-    },
-    bottomModal: {
-        justifyContent: "flex-end",
-        margin: 0
     }
 });
