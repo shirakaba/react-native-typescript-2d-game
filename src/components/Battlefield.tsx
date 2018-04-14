@@ -66,6 +66,7 @@ interface TimeState {
 type BatchedStateComparativeCallback = (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => Partial<BattlefieldState>;
 
 const deviceFramerate: number = 60; // TODO: get proper number from device info.
+const LOSE_GAME_UPON_COLLISION: boolean = true;
 
 export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private frameNo: number = 0;
@@ -77,6 +78,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     private itemRestoreTimeouts: number[] = [];
     private itemRestoreTime: milliseconds = 3000;
     private startGameState: BattlefieldState;
+    private loopID: number;
 
     static contextTypes = {
         loop: PropTypes.object,
@@ -140,21 +142,24 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
 
     private resetGame(): void {
         console.log("RESET GAME");
-        this.setState(this.startGameState);
+        console.log("startGameState", this.startGameState);
+        this.stateBatcher.batchedState = this.startGameState;
+        this.setState(
+            this.startGameState,
+            () => {
+                console.log(`CALLING BACK WITH STARTGAME(). timeSurvived: ${this.state.timeSurvived}`);
+                this.startGame();
+            }
+        );
     }
 
-    private beginTimedEvents(): void {
-        this.scaleInterval = setInterval(
-            () => {
-                if(this.state.redBoxLength === this.redBoxSizeLimit) return;
-                this.stateBatcher.batchState(
-                    (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({
-                        redBoxLength: prevState.redBoxLength + 1
-                    })
-                );
-            },
-            200
-        );
+    private gameOver(): void {
+        console.log("GAME OVER");
+        this.setState({
+            gameOver: true
+        });
+
+        this.cleanUp.call(this);
     }
 
     /**
@@ -163,6 +168,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
      * it has been called, then ultimately sets the state, prompting a render. Finally resets the batchedState.
      */
     private update(): void {
+        console.log("UPDATE");
         this.frameNo++;
 
         this.stateBatcher.batchState(
@@ -195,30 +201,58 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 }
             );
 
-            /* The batchedState is not guaranteed to have all fields populated each update, so we default to the latest
-             * known Battlefield state in each case. */
-            this.stateBatcher.batchState({
-                colliding,
-                gameOver: colliding
-            });
+            if(colliding){
+                this.stateBatcher.batchState({
+                    colliding: true
+                });
+
+                if(LOSE_GAME_UPON_COLLISION) this.gameOver.call(this);
+            }
         }
 
         this.stateBatcher.setStateBatch();
     };
+
+    private startGame(): void {
+        console.log("START GAME");
+        this.loopID = this.context.loop.subscribe(this.update);
+        this.beginTimedEvents();
+    }
+
+    private beginTimedEvents(): void {
+        this.scaleInterval = setInterval(
+            () => {
+                if (this.state.redBoxLength === this.redBoxSizeLimit) return;
+                this.stateBatcher.batchState(
+                    (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({
+                        redBoxLength: prevState.redBoxLength + 1
+                    })
+                );
+            },
+            200
+        );
+    }
 
     /**
      * Any tasks that may have side-effects (e.g. setState()) are recommended to be done here rather than in constructor:
      * https://stackoverflow.com/a/40832293/5951226
      */
     componentDidMount(): void {
-        this.context.loop.subscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
-        this.beginTimedEvents();
+        this.startGame();
+    }
+
+    private cleanUp(): void {
+        console.log("CLEAN UP");
+
+        // this.context.loop.unsubscribe(this.update); // WARNING: Seems to be an undocumented change in the react-game-kit API; you've got to hand in the ID yourself.
+        this.context.loop.unsubscribe(this.loopID); // See react-game-kit for (limited) documentation. Not a Promise.
+
+        clearInterval(this.scaleInterval);
+        this.itemRestoreTimeouts.forEach((timeout: number) => clearInterval(timeout));
     }
 
     componentWillUnmount(): void {
-        this.context.loop.unsubscribe(this.update); // See react-game-kit for (limited) documentation. Not a Promise.
-        clearInterval(this.scaleInterval);
-        this.itemRestoreTimeouts.forEach((timeout: number) => clearInterval(timeout));
+        this.cleanUp();
     }
 
     onResponderGrant(ev: GestureResponderEvent): void {
