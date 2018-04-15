@@ -77,8 +77,8 @@ export class Box extends Component<Props, State> {
 
     componentWillReceiveProps(nextProps: Props): void {
         if(nextProps.gameOver){
-            // this.context.loop.unsubscribe(this.loopID);
-            // this.loopID = null;
+            this.context.loop.unsubscribe(this.loopID);
+            this.loopID = null;
         } else {
             if(this.loopID === null) this.loopID = this.context.loop.subscribe(this.update);
             this.setState({
@@ -96,25 +96,9 @@ export class Box extends Component<Props, State> {
      */
     update() {
         if(this.state.hasDefinitelyArrived){
-            if(this.props.gameOver){
-                if(this.loopID !== null){
-                    this.context.loop.unsubscribe(this.loopID);
-                    this.loopID = null;
-                }
-            }
             return;
         } else {
-            if(this.props.colour === "blue" && this.props.gameOver){
-                if(this.loopID !== null){
-                    this.context.loop.unsubscribe(this.loopID);
-                    this.loopID = null;
-                }
-                this.setState({
-                    hasDefinitelyArrived: true
-                });
-                return;
-            }
-            this.advance(this.props.currentFrameDate);
+            if(!this.props.gameOver) this.advance(this.props.currentFrameDate);
         }
     };
 
