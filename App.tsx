@@ -6,7 +6,7 @@ import {GameLoop} from "./src/components/screens/GameLoop";
 import {Dimensions, Platform, ScaledSize, StatusBar, StyleSheet, View} from "react-native";
 import {loadSoundObjects} from "./src/utils/Sounds";
 import {cacheImages} from "./src/utils/Images";
-import {AppLoading} from "expo";
+import {Audio, AppLoading} from "expo";
 import {itemImageObjs, itemSoundObjs} from "./src/components/Item";
 import {RootNavigator} from './src/components/screens/RootNavigation';
 import {StyleObject} from "./src/utils/utils";
@@ -40,7 +40,6 @@ interface Dimension {
  * different screens in future).
  */
 export default class App extends React.Component<Props, AppState> {
-
     constructor(props: Props) {
         super(props);
 
@@ -73,14 +72,29 @@ export default class App extends React.Component<Props, AppState> {
     }
 
     private loadAssets(): Promise<void | [void, void, {}]> {
-        return Promise.all([
-            loadSoundObjects(itemSoundObjs),
-            cacheImages(Object.keys(itemImageObjs).map((key: string) => itemImageObjs[key].source)),
-            // new Promise((resolve, reject) => {
-            //     console.log("Delaying chain to inspect loading screen...");
-            //     window.setTimeout(() => resolve(), 10000);
-            // })
-        ])
+
+        return Audio.setAudioModeAsync({
+            playsInSilentModeIOS: false,
+            allowsRecordingIOS: false,
+            // interruptionModeIOS: Audio.InterruptionModeIos.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
+            interruptionModeIOS: 0,
+            shouldDuckAndroid: true,
+            // interruptionModeAndroid: Audio.InterruptionModeAndroid.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS
+            interruptionModeAndroid: 2
+        })
+        .catch((e: any) => {
+            throw new Error(e);
+        })
+        .then(() =>
+            Promise.all([
+                loadSoundObjects(itemSoundObjs),
+                cacheImages(Object.keys(itemImageObjs).map((key: string) => itemImageObjs[key].source)),
+                // new Promise((resolve, reject) => {
+                //     console.log("Delaying chain to inspect loading screen...");
+                //     window.setTimeout(() => resolve(), 10000);
+                // })
+            ])
+        )
         .then(() => {
             console.log("All assets loaded successfully!");
         })
