@@ -131,7 +131,9 @@ Images drawn by my brother for the original The Box game over a decade ago. Used
 
 All sounds gratefully sourced from [Taira Komori](http://taira-komori.jpn.org/freesounden.html).
 
-Terms of use [here](http://taira-komori.jpn.org/freesounden.html). In brief: "free of charge and royalty free in your projects... be it for commercial or non-commercial purposes".
+Terms of use [here](http://taira-komori.jpn.org/freesounden.html). In brief: 
+
+> free of charge and royalty free in your projects... be it for commercial or non-commercial purposes.
 
 | Direct download  | Webpage |
 | ------------- | ------------- |
@@ -139,6 +141,7 @@ Terms of use [here](http://taira-komori.jpn.org/freesounden.html). In brief: "fr
 | [attack2.mp3](http://taira-komori.jpn.org/sound_os/attack01/attack2.mp3)  | [Martial Arts > SF](http://taira-komori.jpn.org/attack01en.html)  |
 | [bomb.mp3](http://taira-komori.jpn.org/sound_os/arms01/bomb.mp3)  | [Arms Explosion > Explosion,Launcher](http://taira-komori.jpn.org/arms01en.html)  |
 | [explosion1.mp3](http://taira-komori.jpn.org/sound_os/arms01/explosion1.mp3)  | [Arms Explosion > Explosion,Launcher](http://taira-komori.jpn.org/arms01en.html)  |
+| [kick1.mp3](http://taira-komori.jpn.org/sound_os/arms01/explosion1.mp3)  | [Martial Arts > Punching,Kicking](http://taira-komori.jpn.org/attack01en.html)  |
 | [swing1.mp3](http://taira-komori.jpn.org/sound_os/attack01/swing1.mp3)  | [Martial Arts > Swinging](http://taira-komori.jpn.org/attack01en.html)  |
 | [swing3.mp3](http://taira-komori.jpn.org/sound_os/attack01/swing1.mp3)  | [Martial Arts > Swinging](http://taira-komori.jpn.org/attack01en.html)  |
 

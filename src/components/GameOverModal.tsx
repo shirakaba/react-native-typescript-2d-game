@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {AsyncStorage, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Modal from 'react-native-modal';
 import {milliseconds, StyleObject} from "../utils/utils";
+import {SoundObj, SoundObjs} from "../utils/Sounds";
 
 interface Props {
     modalVisible: boolean,
@@ -16,6 +17,14 @@ interface State {
 }
 
 export const HIGH_SCORE_KEY: string = "highscore";
+
+interface GameOverSoundObjs extends SoundObjs {
+    GAME_OVER: SoundObj;
+}
+
+export const gameOverSoundObjs: GameOverSoundObjs = {
+    GAME_OVER: { source: require("../../assets/sounds/kick1.mp3") }
+};
 
 export class GameOverModal extends Component<Props, State> {
     constructor(props: Props){
@@ -119,7 +128,9 @@ export class GameOverModal extends Component<Props, State> {
                     // console.log("ON MODAL HIDE");
                     this.props.resetGame();
                 }}
-                onModalShow={() => {}}
+                onModalShow={() => {
+                    gameOverSoundObjs.GAME_OVER.obj.playFromPositionAsync(0).catch((e: any) => console.error(e));
+                }}
                 // supportedOrientations={['portrait', 'landscape']}
                 >
                 <View style={styles.modalContent}>

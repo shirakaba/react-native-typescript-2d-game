@@ -10,6 +10,7 @@ import {AppLoading} from "expo";
 import {itemImageObjs, itemSoundObjs} from "./src/components/Item";
 import {RootNavigator} from './src/components/screens/RootNavigation';
 import {StyleObject} from "./src/utils/utils";
+import {gameOverSoundObjs} from "./src/components/GameOverModal";
 
 type AppState = State & DimensionsState;
 type AppProps = Props & StatusBarProps;
@@ -75,6 +76,7 @@ export default class App extends React.Component<Props, AppState> {
     private loadAssets(): Promise<void | [void, void, {}]> {
         return Promise.all([
             loadSoundObjects(itemSoundObjs),
+            loadSoundObjects(gameOverSoundObjs),
             cacheImages(Object.keys(itemImageObjs).map((key: string) => itemImageObjs[key].source)),
             // new Promise((resolve, reject) => {
             //     console.log("Delaying chain to inspect loading screen...");
