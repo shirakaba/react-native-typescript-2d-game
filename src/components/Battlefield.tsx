@@ -32,7 +32,7 @@ type BattlefieldState = BoxStates & CollisionState & TimeState & BattlefieldDime
 
 interface GameState {
     gameOver: boolean,
-    timeSurvived: number
+    timeSurvived: milliseconds
 }
 
 interface BattlefieldDimensionsState {
