@@ -276,12 +276,12 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     }
 
     onResponderGrant(ev: GestureResponderEvent): void {
-        this.updateBlueBoxTarget(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        if(!this.state.gameOver && !this.stateBatcher.batchedState.gameOver) this.updateBlueBoxTarget(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
     // Fired less frequently than screen update, at least for iOS simulator.
     onResponderMove(ev: GestureResponderEvent): void {
-        this.updateBlueBoxTarget(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
+        if(!this.state.gameOver && !this.stateBatcher.batchedState.gameOver) this.updateBlueBoxTarget(ev.nativeEvent.pageX, ev.nativeEvent.pageY);
     }
 
     onPositionUpdate(id: BoxId, left: number, top: number, rotation: number): void {
