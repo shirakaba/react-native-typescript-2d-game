@@ -7,7 +7,7 @@ import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxId, BoxTransforms} from "./Box";
 import {
     ComponentStyle,
-    getPotentiallyUnoccupiedPoint,
+    getPotentiallyUnoccupiedPoint, getRandomInt,
     isColliding,
     milliseconds,
     Point,
@@ -56,6 +56,7 @@ interface BoxStates {
 
 interface ItemStates {
     items: ItemProps[];
+    teleportVillain: boolean;
 }
 
 interface TimeState {
@@ -117,6 +118,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     height: itemLength
                 }
             ),
+            teleportVillain: false,
             stageWidth: this.props.windowDimensions.width,
             stageHeight: this.props.windowDimensions.height,
             lastFrameDate: date,
@@ -340,7 +342,31 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                             this.stateBatcher.batchState((prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => ({ redBoxLength:  Math.max(this.redBoxInitialLength, prevState.redBoxLength - 100) }));
                             break;
                         case ItemType.Teleport:
-                            // TODO: implement.
+                            this.stateBatcher.batchState(
+                                (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => {
+                                    const lengthSquared: number = Math.pow(prevState.redBoxLength, 2);
+                                    const hypotenuse: number = Math.sqrt(lengthSquared + lengthSquared);
+                                    const maxExtrusionAt45Degrees: number = hypotenuse - prevState.redBoxLength;
+                                    const maxBufferZone: number = 200 + maxExtrusionAt45Degrees;
+                                    const minBufferZone: number = prevState.redBoxLength + maxExtrusionAt45Degrees;
+                                    const dim: ScaledSize = props.windowDimensions;
+                                    const longestSideToShortestSideRatio: number = props.portrait ? (dim.height / dim.width) : (dim.width / dim.height);
+                                    const orientationCompensationX: number = props.portrait ? longestSideToShortestSideRatio : 1;
+                                    const orientationCompensationY: number = props.portrait ? 1 : longestSideToShortestSideRatio;
+
+                                    return {
+                                        redBoxTransform: {
+                                            left: (getRandomInt(0, 1) ? -getRandomInt(maxBufferZone, minBufferZone) : getRandomInt(dim.width, maxBufferZone)) * orientationCompensationX,
+                                            top: (getRandomInt(0, 1) ? -getRandomInt(maxBufferZone, minBufferZone) : getRandomInt(dim.height, maxBufferZone)) * orientationCompensationY,
+                                            rotation: prevState.redBoxTransform.rotation
+                                        },
+                                        teleportVillain: true
+                                    }
+                                },
+                                () => {
+                                    this.stateBatcher.batchState({ teleportVillain: false });
+                                }
+                            );
                             break;
                         case ItemType.Mine:
                             // stateBatch.blueBoxSpeed = Math.max(1, (this.stateBatcher.batchedState.blueBoxSpeed || this.state.blueBoxSpeed) - 10);
@@ -469,7 +495,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 onResponderMove={this.onResponderMove.bind(this)}
             >
                 { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
-                <CollisionText colliding={this.state.colliding}/>
+                {/*<CollisionText colliding={this.state.colliding}/>*/}
                 { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
                 <Box
                     id={BoxId.Villain}
@@ -478,8 +504,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     speed={this.state.redBoxSpeed / (1000 / deviceFramerate)}
                     size={this.state.redBoxLength}
                     colour={"red"}
-                    left={this.state.timeSurvived < 1000 ? (this.state.redBoxTransform.left) : null}
-                    top={this.state.timeSurvived < 1000 ? (this.state.redBoxTransform.top) : null}
+                    left={(this.state.timeSurvived === 0 || this.state.teleportVillain) ? (this.state.redBoxTransform.left) : null}
+                    top={(this.state.timeSurvived === 0 || this.state.teleportVillain) ? (this.state.redBoxTransform.top) : null}
                     targetLeft={blueCentredTargetLeft}
                     targetTop={blueCentredTargetTop}
                     onPositionUpdate={this.onPositionUpdate.bind(this)}
@@ -492,8 +518,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     speed={this.state.blueBoxSpeed / (1000 / deviceFramerate)}
                     size={this.blueBoxLength}
                     colour={"blue"}
-                    left={this.state.timeSurvived < 1000 ? this.state.blueBoxTransform.left : null}
-                    top={this.state.timeSurvived < 1000 ? this.state.blueBoxTransform.top : null}
+                    left={this.state.timeSurvived === 0 ? this.state.blueBoxTransform.left : null}
+                    top={this.state.timeSurvived === 0 ? this.state.blueBoxTransform.top : null}
                     targetLeft={this.state.blueBoxTargetLocation.left}
                     targetTop={this.state.blueBoxTargetLocation.top}
                     onPositionUpdate={this.onPositionUpdate.bind(this)}

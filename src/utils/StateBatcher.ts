@@ -61,6 +61,15 @@ export class StateBatcher<Props, State> {
         );
     }
 
+    /**
+     * Runs all the completion callbacks queued up for the state batch. Provided that clearBatch() keeps the last batchedState,
+     * (rather than setting batchedState = {}), and callbacks passed in needn't be pure; if the callbacks invoke setBatch()
+     * themselves, then those setBatch() calls WILL impact the following batch.
+     *
+     * @param batchedStateCompletionCallbacks
+     * @returns If batchedStateCompletionCallbacks is empty, undefined; otherwise, a function for invoking all the
+     *          batchedStateCompletionCallbacks.
+     */
     private passOptionalBatchedStateCompletionCallback(batchedStateCompletionCallbacks: (()=>void)[]): undefined|(()=>void) {
         console.log(`passOptionalBatchedStateCompletionCallback()`);
         if(batchedStateCompletionCallbacks.length === 0) return undefined;
