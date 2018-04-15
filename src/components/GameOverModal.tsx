@@ -1,7 +1,7 @@
-import React, {Component, PureComponent} from 'react';
-import {AsyncStorage, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
+import React, {Component} from 'react';
+import {AsyncStorage, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Modal from 'react-native-modal';
-import {hasArrivedAtCoord, milliseconds, StyleObject} from "../utils/utils";
+import {milliseconds, StyleObject} from "../utils/utils";
 
 interface Props {
     modalVisible: boolean,
@@ -58,7 +58,7 @@ export class GameOverModal extends Component<Props, State> {
     }
 
     private assessHighScore(timeSurvived?: number): Promise<string> {
-        console.log(`Assessing high score...`);
+        // console.log(`Assessing high score...`);
 
         return AsyncStorage.getItem(
             HIGH_SCORE_KEY,

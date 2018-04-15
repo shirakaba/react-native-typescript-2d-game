@@ -2,12 +2,12 @@
 // Licensed under GPL; find at repo root, in LICENSE.txt.
 
 import React, {Component} from 'react';
-import {Dimensions, GestureResponderEvent, Platform, ScaledSize, StyleSheet, Text, View} from 'react-native';
+import { GestureResponderEvent, ScaledSize, StyleSheet, View} from 'react-native';
 import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxId, BoxTransforms} from "./Box";
 import {
     ComponentStyle,
-    getPotentiallyUnoccupiedPoint, getPotentiallyUnoccupiedPointWithinWindow, getRandomInt,
+    getPotentiallyUnoccupiedPoint, getPotentiallyUnoccupiedPointWithinWindow,
     isColliding,
     milliseconds,
     Point,
@@ -19,9 +19,7 @@ import PropTypes from 'prop-types';
 import {Item, ItemProps, itemLength, ItemType} from "./Item";
 import {DimensionsState} from "../../App";
 import {StateBatcher} from "../utils/StateBatcher";
-import {CollisionText} from "./CollisionText";
 import {GameOverModal} from './GameOverModal';
-import {Aligner} from "./Aligner";
 
 type BattlefieldProps = Props & DimensionsState;
 

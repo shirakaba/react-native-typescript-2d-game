@@ -3,7 +3,7 @@
 
 import React, { Component } from 'react';
 import {
-    View, StyleSheet, ViewStyle, TextStyle, ImageStyle, ScaledSize
+    View, StyleSheet, ScaledSize
 } from 'react-native';
 import PropTypes from 'prop-types';
 import {ComponentStyle, getRandomInt, hasArrivedAtCoord, Point, StyleObject} from "../utils/utils";
