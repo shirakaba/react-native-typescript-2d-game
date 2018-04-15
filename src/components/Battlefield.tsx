@@ -7,7 +7,7 @@ import { Loop, Stage } from 'react-game-kit/native';
 import {Box, BoxId, BoxTransforms} from "./Box";
 import {
     ComponentStyle,
-    getPotentiallyUnoccupiedPoint, getRandomInt,
+    getPotentiallyUnoccupiedPoint, getPotentiallyUnoccupiedPointWithinWindow, getRandomInt,
     isColliding,
     milliseconds,
     Point,
@@ -85,11 +85,9 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         loop: PropTypes.object,
     };
 
-    constructor(props: BattlefieldProps) {
-        super(props);
-        const blueInitialLeft: number = 200;
-        const blueInitialTop: number = 400;
-        const date: number = Date.now();
+    private generateNewGameState(windowDimensions: ScaledSize): BattlefieldState {
+        const blueInitialLeft: number = windowDimensions.width / 2;
+        const blueInitialTop: number = windowDimensions.height / 2;
 
         const blueBoxTransform: BoxTransforms = {
             left: blueInitialLeft,
@@ -97,15 +95,16 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             rotation: 0
         };
 
-        this.state = this.startGameState = {
+        const date: number = Date.now();
+        return {
             gameOver: false,
             timeSurvived: 0,
             items: this.mapItemTypesToItemStates(
                 {
                     left: 0,
                     top: 0,
-                    width: this.props.windowDimensions.width,
-                    height: this.props.windowDimensions.height,
+                    width: windowDimensions.width,
+                    height: windowDimensions.height,
                 },
                 {
                     left: blueBoxTransform.left,
@@ -119,14 +118,13 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 }
             ),
             teleportVillain: false,
-            stageWidth: this.props.windowDimensions.width,
-            stageHeight: this.props.windowDimensions.height,
+            stageWidth: windowDimensions.width,
+            stageHeight: windowDimensions.height,
             lastFrameDate: date,
             currentFrameDate: date,
             colliding: false,
             redBoxTransform: {
-                left: 90,
-                top: 75,
+                ...Box.generateRandomOffscreenBoxPosition(this.redBoxInitialLength, this.props.portrait, windowDimensions),
                 rotation: 0
             },
             redBoxLength: this.redBoxInitialLength,
@@ -138,17 +136,20 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 top: blueInitialTop
             }
         };
+    }
+
+    constructor(props: BattlefieldProps) {
+        super(props);
+
+        this.state = this.startGameState = this.generateNewGameState(this.props.windowDimensions);
 
         this.update = this.update.bind(this);
     }
 
     private resetGame(): void {
         // console.log("RESET GAME");
-        const date: Date = new Date();
-        Object.assign(this.startGameState, { lastFrameDate: date, currentFrameDate: date });
-        // this.stateBatcher.batchedState = Object.assign(this.startGameState, { lastFrameDate: date, currentFrameDate: date });
-        this.stateBatcher.batchedState = {};
-        // console.log("startGameState", this.stateBatcher.batchedState);
+
+        this.stateBatcher.batchedState = this.startGameState = this.generateNewGameState(this.props.windowDimensions);
         this.stateBatcher.clearBatch();
 
         // console.log(
@@ -344,20 +345,9 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         case ItemType.Teleport:
                             this.stateBatcher.batchState(
                                 (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => {
-                                    const lengthSquared: number = Math.pow(prevState.redBoxLength, 2);
-                                    const hypotenuse: number = Math.sqrt(lengthSquared + lengthSquared);
-                                    const maxExtrusionAt45Degrees: number = hypotenuse - prevState.redBoxLength;
-                                    const maxBufferZone: number = 200 + maxExtrusionAt45Degrees;
-                                    const minBufferZone: number = prevState.redBoxLength + maxExtrusionAt45Degrees;
-                                    const dim: ScaledSize = props.windowDimensions;
-                                    const longestSideToShortestSideRatio: number = props.portrait ? (dim.height / dim.width) : (dim.width / dim.height);
-                                    const orientationCompensationX: number = props.portrait ? longestSideToShortestSideRatio : 1;
-                                    const orientationCompensationY: number = props.portrait ? 1 : longestSideToShortestSideRatio;
-
                                     return {
                                         redBoxTransform: {
-                                            left: (getRandomInt(0, 1) ? -getRandomInt(maxBufferZone, minBufferZone) : getRandomInt(dim.width, maxBufferZone)) * orientationCompensationX,
-                                            top: (getRandomInt(0, 1) ? -getRandomInt(maxBufferZone, minBufferZone) : getRandomInt(dim.height, maxBufferZone)) * orientationCompensationY,
+                                            ...Box.generateRandomOffscreenBoxPosition(prevState.redBoxLength, props.portrait, props.windowDimensions),
                                             rotation: prevState.redBoxTransform.rotation
                                         },
                                         teleportVillain: true
@@ -391,23 +381,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 const items: ItemProps[] = JSON.parse(JSON.stringify((this.stateBatcher.batchedState.items || this.state.items)));
                 items[index].consumed = false;
 
-                const isIphoneX: boolean = Platform.OS === 'ios' && (this.props.screenDimensions.width === 812 || this.props.screenDimensions.height === 812);
-                // https://www.paintcodeapp.com/news/iphone-x-screen-demystified
-                // https://developer.apple.com/ios/human-interface-guidelines/overview/iphone-x/
-                const NOTCH_DEPTH: number = 30;
-                const OPPOSITE_CURVE_DEPTH: number = NOTCH_DEPTH; // Best guess.
-
-                const windowWidth: number = this.props.windowDimensions.width;
-                const windowHeight: number = this.props.windowDimensions.height;
-
-                const point: Point = getPotentiallyUnoccupiedPoint(
-                    {
-                        // I don't know how to determine whether we're in primary/secondary portrait/landscape mode, so I design as if there's a notch on BOTH sides.
-                        left: isIphoneX ? (this.props.portrait ? 0 : NOTCH_DEPTH) : 0,
-                        top: isIphoneX ? (this.props.portrait ? NOTCH_DEPTH  : 0) : 0,
-                        width: isIphoneX ? (this.props.portrait ? windowWidth : windowWidth - (NOTCH_DEPTH + OPPOSITE_CURVE_DEPTH)) : windowWidth,
-                        height: isIphoneX ? (this.props.portrait ? windowHeight - (NOTCH_DEPTH + OPPOSITE_CURVE_DEPTH) : windowHeight) : windowHeight,
-                    },
+                const point: Point = getPotentiallyUnoccupiedPointWithinWindow(
                     {
                         left: this.state.blueBoxTransform.left,
                         top: this.state.blueBoxTransform.top,
@@ -417,7 +391,10 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                     {
                         width: itemLength,
                         height: itemLength
-                    }
+                    },
+                    this.props.portrait,
+                    this.props.screenDimensions,
+                    this.props.windowDimensions
                 );
 
                 items[index].left = point.left;

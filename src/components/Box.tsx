@@ -3,10 +3,10 @@
 
 import React, { Component } from 'react';
 import {
-    View, StyleSheet, ViewStyle, TextStyle, ImageStyle
+    View, StyleSheet, ViewStyle, TextStyle, ImageStyle, ScaledSize
 } from 'react-native';
 import PropTypes from 'prop-types';
-import {ComponentStyle, hasArrivedAtCoord, StyleObject} from "../utils/utils";
+import {ComponentStyle, getRandomInt, hasArrivedAtCoord, Point, StyleObject} from "../utils/utils";
 
 export const enum BoxId {
     Hero,
@@ -166,6 +166,28 @@ export class Box extends Component<Props, State> {
                 hasDefinitelyArrived: hasArrivedAtCoord(props.targetLeft, left) && hasArrivedAtCoord(props.targetTop, top)
             }
         });
+    }
+
+    public static generateRandomOffscreenBoxPosition(redBoxLength: number, portrait: boolean, windowDimensions: ScaledSize): Point {
+        const lengthSquared: number = Math.pow(redBoxLength, 2);
+        const hypotenuse: number = Math.sqrt(lengthSquared + lengthSquared);
+        const maxExtrusionAt45Degrees: number = hypotenuse - redBoxLength;
+        const maxBufferZone: number = 200 + maxExtrusionAt45Degrees;
+        const minBufferZone: number = redBoxLength + maxExtrusionAt45Degrees;
+        const longestSideToShortestSideRatio: number = portrait ?
+            (windowDimensions.height / windowDimensions.width) :
+            (windowDimensions.width / windowDimensions.height);
+        const orientationCompensationX: number = portrait ? longestSideToShortestSideRatio : 1;
+        const orientationCompensationY: number = portrait ? 1 : longestSideToShortestSideRatio;
+
+        return {
+            left: (getRandomInt(0, 1) ?
+                -getRandomInt(maxBufferZone, minBufferZone) :
+                getRandomInt(windowDimensions.width, maxBufferZone)) * orientationCompensationX,
+            top: (getRandomInt(0, 1) ?
+                -getRandomInt(maxBufferZone, minBufferZone) :
+                getRandomInt(windowDimensions.height, maxBufferZone)) * orientationCompensationY,
+        }
     }
 
     /** Very likely that my naive implementation has room for improvement here. Open to comments.

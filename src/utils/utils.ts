@@ -1,7 +1,8 @@
 // Copyright © 2018 Jamie Birch
 // Licensed under GPL; find at repo root, in LICENSE.txt.
 
-import {ImageStyle, TextStyle, ViewStyle} from "react-native";
+import {ImageStyle, Platform, ScaledSize, TextStyle, ViewStyle} from "react-native";
+import {itemLength} from "../components/Item";
 
 export interface StyleObject {
     [key: string]: Partial<ComponentStyle>;
@@ -98,4 +99,36 @@ export function getPotentiallyUnoccupiedPoint(allowedZone: Zone, forbiddenZone: 
     } else {
         return point;
     }
+}
+
+export function getPotentiallyUnoccupiedPointWithinWindow(
+    forbiddenZone: Zone,
+    objectSize: Size,
+    portrait: boolean,
+    screenDimensions: ScaledSize,
+    windowDimensions: ScaledSize
+): Point {
+    const isIphoneX: boolean = Platform.OS === 'ios' && (screenDimensions.width === 812 || screenDimensions.height === 812);
+    // https://www.paintcodeapp.com/news/iphone-x-screen-demystified
+    // https://developer.apple.com/ios/human-interface-guidelines/overview/iphone-x/
+    const NOTCH_DEPTH: number = 30;
+    const OPPOSITE_CURVE_DEPTH: number = NOTCH_DEPTH; // Best guess.
+
+    const windowWidth: number = windowDimensions.width;
+    const windowHeight: number = windowDimensions.height;
+
+    return getPotentiallyUnoccupiedPoint(
+        {
+            // I don't know how to determine whether we're in primary/secondary portrait/landscape mode, so I design as if there's a notch on BOTH sides.
+            left: isIphoneX ? (portrait ? 0 : NOTCH_DEPTH) : 0,
+            top: isIphoneX ? (portrait ? NOTCH_DEPTH  : 0) : 0,
+            width: isIphoneX ? (portrait ? windowWidth : windowWidth - (NOTCH_DEPTH + OPPOSITE_CURVE_DEPTH)) : windowWidth,
+            height: isIphoneX ? (portrait ? windowHeight - (NOTCH_DEPTH + OPPOSITE_CURVE_DEPTH) : windowHeight) : windowHeight,
+        },
+        forbiddenZone,
+        {
+            width: itemLength,
+            height: itemLength
+        }
+    );
 }

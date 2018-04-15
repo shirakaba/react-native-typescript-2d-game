@@ -6,7 +6,6 @@
         "githubUrl": "https://github.com/shirakaba/react-native-typescript-2d-game",
         "privacy": "public",
         "version": "1.6.0",
-        "orientation": "portrait",
         "primaryColor": "#fd9408",
         "icon": "./assets/icons/icon.png",
         "sdkVersion": "26.0.0"
