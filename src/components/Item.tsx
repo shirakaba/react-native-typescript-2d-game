@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import {
     StyleSheet, Image, ImageRequireSource
 } from 'react-native';
-import {PlaybackStatus} from 'expo';
+import {PlaybackStatus, PlaybackStatusToSet} from 'expo';
 import {ComponentStyle, StyleObject } from "../utils/utils";
 import {SoundObj, SoundObjs} from "../utils/Sounds";
 import {ImageObj, ImageObjs} from "../utils/Images";
@@ -139,17 +139,17 @@ export class Item extends Component<ItemProps, State> {
                 // Licence on freesound: https://creativecommons.org/licenses/by/3.0/ (Attribution 3.0 Unported (CC BY 3.0))
                 // Attribution on Taira Komori's own website: "Please consider giving me a credit or linking back to me"
                 // Terms of Use: "free of charge and royalty free in your projects... be it for commercial or non-commercial purposes"
-                return itemSoundObjs.SPEED.obj.playAsync();
+                return itemSoundObjs.SPEED.obj.playFromPositionAsync(0);//.then((status: PlaybackStatus) => itemSoundObjs.SPEED.obj.);
             case ItemType.Shrink:
                 // Taira Komori again:
                 // http://taira-komori.jpn.org/attack01en.html
                 // http://taira-komori.jpn.org/sound_os/attack01/swing3.mp3
-                return itemSoundObjs.SHRINK.obj.playAsync();
+                return itemSoundObjs.SHRINK.obj.playFromPositionAsync(0);//.then((status: PlaybackStatus) => itemSoundObjs.SHRINK.obj.);
             case ItemType.Teleport:
                 // Taira Komori again:
                 // http://taira-komori.jpn.org/attack01en.html
                 // http://taira-komori.jpn.org/sound_os/attack01/attack2.mp3
-                return itemSoundObjs.TELEPORT.obj.playAsync();
+                return itemSoundObjs.TELEPORT.obj.playFromPositionAsync(0);//.then((status: PlaybackStatus) => itemSoundObjs.TELEPORT.obj.);
             case ItemType.Mine:
                 // Taira Komori again:
                 // http://taira-komori.jpn.org/attack01en.html
@@ -157,9 +157,9 @@ export class Item extends Component<ItemProps, State> {
                 // http://taira-komori.jpn.org/sound_os/attack01/attack1.mp3
                 // http://taira-komori.jpn.org/sound_os/arms01/bomb.mp3
                 // http://taira-komori.jpn.org/sound_os/arms01/explosion1.mp3
-                return itemSoundObjs.MINE.obj.playAsync();
+                return itemSoundObjs.MINE.obj.playFromPositionAsync(0);//.then((status: PlaybackStatus) => itemSoundObjs.MINE.obj.);
             default:
-                return itemSoundObjs.SPEED.obj.playAsync();
+                return itemSoundObjs.SPEED.obj.playFromPositionAsync(0);//.then((status: PlaybackStatus) => itemSoundObjs.SPEED.obj.);
         }
     }
 
