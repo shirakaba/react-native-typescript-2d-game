@@ -4,7 +4,6 @@ import Modal from 'react-native-modal';
 import {StyleObject} from "../utils/utils";
 
 interface Props {
-    // deviceHeight: number,
     modalVisible: boolean,
     timeSurvived: number,
     resetGame: () => void
@@ -12,7 +11,6 @@ interface Props {
 
 interface State {
     modalVisible: boolean,
-    // modalCommitted: boolean,
     timeSurvived: number
 }
 
@@ -22,46 +20,26 @@ export class GameOverModal extends Component<Props, State> {
 
         this.state = {
             modalVisible: this.props.modalVisible,
-            // modalCommitted: false,
             timeSurvived: 0
         };
     }
 
     componentWillReceiveProps(nextProps: Readonly<Props>, nextContext: any): void {
-        // if(this.state.modalCommitted && this.state.modalVisible){
         if(this.state.modalVisible){
-            // if(nextProps.)
-            // console.log("MODAL COMMITTED");
             return
         } else {
-            if(
-                nextProps.modalVisible !== this.state.modalVisible
-                // nextProps.timeSurvived !== this.state.timeSurvived ||
-                // this.state.modalCommitted === false
-               ){
-                // console.log("MODAL NOT COMMITTED");
+            if(nextProps.modalVisible !== this.state.modalVisible){
                 this.setState({
                     modalVisible: nextProps.modalVisible,
                     timeSurvived: nextProps.timeSurvived
-                    // modalCommitted: true
                 });
             }
         }
     }
 
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
-        // if(this.state.modalCommitted && this.props.timeSurvived > this.state.timeSurvived) return false;
-        // if(this.props.timeSurvived > this.state.timeSurvived) return false;
-        // return true;
-        if(nextProps.modalVisible !== this.state.modalVisible){
-            // console.log("SHOULD UPDATE");
-            return true;
-        }
-        if(nextState.modalVisible !== this.state.modalVisible){
-            return true;
-        }
-        // if(this.state.modalVisible) return true;
-        // if(this.state.modalCommitted) return false;
+        if(nextProps.modalVisible !== this.state.modalVisible) return true;
+        if(nextState.modalVisible !== this.state.modalVisible) return true;
         return false;
     }
 
@@ -69,10 +47,9 @@ export class GameOverModal extends Component<Props, State> {
         this.setState({modalVisible: visible});
     }
 
-    render() {
-        // console.log(`this.state.modalVisible:`, this.state.modalVisible);
-        // console.log(`this.props.timeSurvived:`, this.props.timeSurvived);
 
+
+    render() {
         return (
             <Modal
                 // animationIn="slideInUp"
@@ -103,6 +80,11 @@ export class GameOverModal extends Component<Props, State> {
                         >
                             {`You lasted ${(this.state.timeSurvived / 1000).toFixed(1)} seconds.`}
                         </Text>
+                        <Text
+                            style={{
+                                textAlign: "center"
+                            }}
+                        >{`Last record: `}</Text>
 
                         <TouchableOpacity
                             onPress={() => {
