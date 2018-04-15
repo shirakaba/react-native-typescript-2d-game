@@ -143,7 +143,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     }
 
     private resetGame(): void {
-        console.log("RESET GAME");
+        // console.log("RESET GAME");
         const date: Date = new Date();
         Object.assign(this.startGameState, { lastFrameDate: date, currentFrameDate: date });
         // this.stateBatcher.batchedState = Object.assign(this.startGameState, { lastFrameDate: date, currentFrameDate: date });
@@ -151,10 +151,10 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         // console.log("startGameState", this.stateBatcher.batchedState);
         this.stateBatcher.clearBatch();
 
-        console.log(
-            "[resetGame()] this.stateBatcher.batchedState",
-            this.stateBatcher.batchedState
-        );
+        // console.log(
+        //     // "[resetGame()] this.stateBatcher.batchedState",
+        //     this.stateBatcher.batchedState
+        // );
 
         this.setState(
             this.startGameState,
@@ -166,7 +166,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     }
 
     private gameOver(): void {
-        console.log("GAME OVER");
+        // console.log("GAME OVER");
         this.setState({
             gameOver: true
         });
@@ -187,7 +187,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             (prevState: Readonly<BattlefieldState>, props: BattlefieldProps) => {
                 const currentFrameDate: number = Date.now();
                 // console.log(`${prevState.timeSurvived + (prevState.currentFrameDate - prevState.lastFrameDate)}`);
-                console.log(`prevState.timeSurvived: ${prevState.timeSurvived}`);
+                // console.log(`prevState.timeSurvived: ${prevState.timeSurvived}`);
                 return {
                     currentFrameDate: currentFrameDate,
                     lastFrameDate: prevState.currentFrameDate,
@@ -197,10 +197,10 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         );
 
         if(this.stateBatcher.batchedState.redBoxTransform || this.stateBatcher.batchedState.blueBoxTransform){
-            console.log(
-                "[update()] this.stateBatcher.batchedState",
-                this.stateBatcher.batchedState
-            );
+            // console.log(
+            //     // "[update()] this.stateBatcher.batchedState",
+            //     this.stateBatcher.batchedState
+            // );
 
             const redBoxTransform: Point = this.stateBatcher.batchedState.redBoxTransform || this.state.redBoxTransform;
             const redBoxLength: number = this.stateBatcher.batchedState.redBoxLength || this.state.redBoxLength;
@@ -232,7 +232,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     };
 
     private startGame(): void {
-        console.log("START GAME. state:", this.state);
+        // console.log("START GAME. state:", this.state);
         // The moment we subscribe to the loop again, we see the GAME OVER message, because update() runs and somehow box positions haven't yet been reset.
         this.loopID = this.context.loop.subscribe(this.update);
         this.beginTimedEvents();
@@ -261,7 +261,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     }
 
     private cleanUp(): void {
-        console.log("CLEAN UP");
+        // console.log("CLEAN UP");
 
         // this.context.loop.unsubscribe(this.update); // WARNING: Seems to be an undocumented change in the react-game-kit API; you've got to hand in the ID yourself.
         this.context.loop.unsubscribe(this.loopID); // See react-game-kit for (limited) documentation. Not a Promise.
@@ -485,7 +485,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         const blueCentredTargetLeft: number = this.state.blueBoxTransform.left + this.blueBoxLength/2 - this.state.redBoxLength/2;
         const blueCentredTargetTop: number = this.state.blueBoxTransform.top + this.blueBoxLength/2 - this.state.redBoxLength/2;
 
-        console.log("RENDERING. TIMESURVIVED:", this.state.timeSurvived);
+        // console.log("RENDERING. TIMESURVIVED:", this.state.timeSurvived);
 
         return (
             <View

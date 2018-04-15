@@ -45,10 +45,10 @@ export class StateBatcher<Props, State> {
         batchedStateCompletionCallbacks: (()=>void)[],
         batchedStateComparativeCallbacks: BatchedStateComparativeCallback<Props, State>[]
     ): void {
-        console.log(`invokeBatchedStateComparativeCallbacks()`);
+        // console.log(`invokeBatchedStateComparativeCallbacks()`);
         this.setState(
             (prevState: Readonly<State>, props: Props) => {
-                console.log("prevState:", prevState);
+                // console.log("prevState:", prevState);
                 return batchedStateComparativeCallbacks
                 .reduce(
                     (acc: Partial<State>, batchCb: BatchedStateComparativeCallback<Props, State>, i: number, arr: BatchedStateComparativeCallback<Props, State>[]) => {
@@ -71,7 +71,7 @@ export class StateBatcher<Props, State> {
      *          batchedStateCompletionCallbacks.
      */
     private passOptionalBatchedStateCompletionCallback(batchedStateCompletionCallbacks: (()=>void)[]): undefined|(()=>void) {
-        console.log(`passOptionalBatchedStateCompletionCallback()`);
+        // console.log(`passOptionalBatchedStateCompletionCallback()`);
         if(batchedStateCompletionCallbacks.length === 0) return undefined;
         return () => {
             batchedStateCompletionCallbacks.forEach((callback: () => void) => callback());
@@ -79,7 +79,7 @@ export class StateBatcher<Props, State> {
     }
 
     public setStateBatch(): void {
-        console.log(`setStateBatch()`);
+        // console.log(`setStateBatch()`);
         if(this.batchedStateComparativeCallbacks.length > 0){
             this.invokeBatchedStateComparativeCallbacks(this.batchedState, this.batchedStateCompletionCallbacks, this.batchedStateComparativeCallbacks);
         } else {

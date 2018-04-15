@@ -38,7 +38,7 @@ export class GameOverModal extends Component<Props, State> {
                 // nextProps.timeSurvived !== this.state.timeSurvived ||
                 this.state.modalCommitted === false
                ){
-                console.log("MODAL NOT COMMITTED");
+                // console.log("MODAL NOT COMMITTED");
                 this.setState({
                     modalVisible: nextProps.modalVisible,
                     timeSurvived: nextProps.timeSurvived,
@@ -70,7 +70,7 @@ export class GameOverModal extends Component<Props, State> {
 
     render() {
         // console.log(`this.state.modalVisible:`, this.state.modalVisible);
-        console.log(`this.props.timeSurvived:`, this.props.timeSurvived);
+        // console.log(`this.props.timeSurvived:`, this.props.timeSurvived);
 
         return (
             <Modal
@@ -80,7 +80,7 @@ export class GameOverModal extends Component<Props, State> {
                 animationIn="shake"
                 isVisible={this.state.modalVisible}
                 onModalHide={() => {
-                    console.log("ON MODAL HIDE");
+                    // console.log("ON MODAL HIDE");
                     this.props.resetGame();
                 }}
                 onModalShow={() => {}}
