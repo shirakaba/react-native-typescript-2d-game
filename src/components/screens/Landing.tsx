@@ -8,6 +8,8 @@ import {StyleObject} from "../../utils/utils";
 import {NavigationNavigatorProps} from "react-navigation";
 import {NavigationNavigatorPropsNarrowed, ScreenProps} from "./RootNavigation";
 
+const pkg: { version: string } = require('../../../package.json');
+
 type LandingProps = Props & NavigationNavigatorPropsNarrowed;
 // type LandingProps = Props & ScreenProps;
 
@@ -37,6 +39,7 @@ export class Landing extends Component<LandingProps, State> {
                     title={"PLAY"}
                     accessibilityLabel="Play"
                 />
+                <Text>{`Version ${pkg.version}`}</Text>
             </View>
         );
     }

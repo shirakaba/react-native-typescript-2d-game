@@ -5,7 +5,7 @@
         "slug": "the-box",
         "githubUrl": "https://github.com/shirakaba/react-native-typescript-2d-game",
         "privacy": "public",
-        "version": "1.7.1",
+        "version": "1.7.3",
         "primaryColor": "#fd9408",
         "icon": "./assets/icons/icon.png",
         "sdkVersion": "26.0.0"

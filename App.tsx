@@ -75,8 +75,7 @@ export default class App extends React.Component<Props, AppState> {
 
     private loadAssets(): Promise<void | [void, void, {}]> {
         return Promise.all([
-            loadSoundObjects(itemSoundObjs),
-            loadSoundObjects(gameOverSoundObjs),
+            loadSoundObjects({ ...itemSoundObjs, ...gameOverSoundObjs}),
             cacheImages(Object.keys(itemImageObjs).map((key: string) => itemImageObjs[key].source)),
             // new Promise((resolve, reject) => {
             //     console.log("Delaying chain to inspect loading screen...");
