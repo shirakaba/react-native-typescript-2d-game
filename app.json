@@ -8,14 +8,22 @@
         "version": "1.7.3",
         "primaryColor": "#fd9408",
         "icon": "./assets/icons/icon.png",
-        "sdkVersion": "26.0.0"
+        "sdkVersion": "26.0.0",
+        "splash": {
+            "image": "./assets/icons/loading.png",
+            "resizeMode": "cover",
+            "backgroundColor": "#FEF9B0",
+            "hideExponentText": false
+        }
     },
     "ios": {
         "supportsTablet": true,
         "splash": {
             "image": "./assets/icons/loading.png",
+            "tabletImage": "./assets/icons/loading.png",
             "resizeMode": "cover",
-            "backgroundColor": "#000000"
+            "backgroundColor": "#FEF9B0",
+            "hideExponentText": false
         }
     }
 }
