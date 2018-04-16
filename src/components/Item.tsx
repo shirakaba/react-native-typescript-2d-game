@@ -59,7 +59,7 @@ export const itemSoundObjs: ItemSoundObjs = {
 };
 
 // TODO: Figure out how to rewrite as class static.
-export const itemLength: number = 20;
+export const ITEM_LENGTH: number = 20;
 
 export class Item extends Component<ItemProps, State> {
     // TODO: Find out why static values don't work in a React component. May be due to PropTypes.
@@ -170,8 +170,8 @@ export class Item extends Component<ItemProps, State> {
     render() {
         const dynamicStyle: Partial<ComponentStyle> = {
             // backgroundColor: this.colour,
-            width: itemLength,
-            height: itemLength,
+            width: ITEM_LENGTH,
+            height: ITEM_LENGTH,
             transform: [
                 { translateX: this.props.left },
                 { translateY: this.props.top }

@@ -16,7 +16,7 @@ import {
     Zone
 } from "../utils/utils";
 import PropTypes from 'prop-types';
-import {Item, ItemProps, itemLength, ItemType} from "./Item";
+import {Item, ItemProps, ITEM_LENGTH, ItemType} from "./Item";
 import {DimensionsState} from "../../App";
 import {StateBatcher} from "../utils/StateBatcher";
 import {GameOverModal} from './GameOverModal';
@@ -99,20 +99,14 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             timeSurvived: 0,
             items: this.mapItemTypesToItemStates(
                 {
-                    left: 0,
-                    top: 0,
-                    width: windowDimensions.width,
-                    height: windowDimensions.height,
-                },
-                {
                     left: blueBoxTransform.left,
                     top: blueBoxTransform.top,
                     width: this.blueBoxLength,
                     height: this.blueBoxLength,
                 },
                 {
-                    width: itemLength,
-                    height: itemLength
+                    width: ITEM_LENGTH,
+                    height: ITEM_LENGTH
                 }
             ),
             teleportVillain: false,
@@ -205,6 +199,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             const redBoxLength: number = this.stateBatcher.batchedState.redBoxLength || this.state.redBoxLength;
             const blueBoxTransform: Point = this.stateBatcher.batchedState.blueBoxTransform || this.state.blueBoxTransform;
 
+            // TODO: reduce red box's collision size when it's rotated
             const colliding: boolean = isColliding(
                 {
                     ...redBoxTransform,
@@ -317,8 +312,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         {
                             left: item.left,
                             top: item.top,
-                            width: itemLength,
-                            height: itemLength,
+                            width: ITEM_LENGTH,
+                            height: ITEM_LENGTH,
                         }
                     );
 
@@ -387,8 +382,8 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                         height: this.blueBoxLength,
                     },
                     {
-                        width: itemLength,
-                        height: itemLength
+                        width: ITEM_LENGTH,
+                        height: ITEM_LENGTH
                     },
                     this.props.portrait,
                     this.props.screenDimensions,
@@ -437,16 +432,21 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         });
     }
 
-    private mapItemTypesToItemStates(allowedZone: Zone, forbiddenZone: Zone, itemSize: Size): ItemProps[] {
+    private mapItemTypesToItemStates(forbiddenZone: Zone, itemSize: Size): ItemProps[] {
         // Iterating over TypeScript enums: https://stackoverflow.com/a/21294925/5951226
         return Object.keys(ItemType)
         .filter((key: string) => typeof ItemType[key] === "number")
         .map((key: string, i: number) => {
-            const unoccupiedPoint: Point = getPotentiallyUnoccupiedPoint(allowedZone, forbiddenZone, itemSize);
+            const unoccupiedPoint: Point = getPotentiallyUnoccupiedPointWithinWindow(
+                forbiddenZone,
+                itemSize,
+                this.props.portrait,
+                this.props.screenDimensions,
+                this.props.windowDimensions
+            );
             return {
                 type: ItemType[key],
-                left: unoccupiedPoint.left,
-                top: unoccupiedPoint.top,
+                ...unoccupiedPoint,
                 consumed: false,
             };
         })
@@ -469,8 +469,6 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
                 onResponderGrant={this.onResponderGrant.bind(this)}
                 onResponderMove={this.onResponderMove.bind(this)}
             >
-                { /* TODO: restrict components, particularly Items, purely to the visible area, not the whole window area. */ }
-                {/*<CollisionText colliding={this.state.colliding}/>*/}
                 { this.state.items.map((item: ItemProps, i: number, items: ItemProps[]) => <Item key={i} type={item.type} left={item.left} top={item.top} consumed={items[i].consumed}/>) }
                 <Box
                     id={BoxId.Villain}
@@ -518,17 +516,6 @@ const styles: StyleObject = StyleSheet.create<StyleObject>({
         position: 'absolute',
         height: "100%",
         width: "100%",
-        backgroundColor: 'orange',
-    },
-    collisionIndicator: {
-        position: 'absolute',
-        left: 50,
-        top: 50,
-        fontSize: 20,
-        fontWeight: 'bold',
-        // borderColor: "black",
-        // borderStyle: "dashed",
-        // borderWidth: 1,
-        backgroundColor: "rgba(255, 255, 0, 1)"
+        backgroundColor: 'orange'
     }
 });

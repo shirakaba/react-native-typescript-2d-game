@@ -1,6 +1,6 @@
 {
   "name": "TheBox",
-  "version": "1.7.3",
+  "version": "1.8.0",
   "private": true,
   "devDependencies": {
     "@types/expo": "^25.0.4",

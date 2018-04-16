@@ -5,14 +5,14 @@
         "slug": "the-box",
         "githubUrl": "https://github.com/shirakaba/react-native-typescript-2d-game",
         "privacy": "public",
-        "version": "1.7.3",
+        "version": "1.8.0",
         "primaryColor": "#fd9408",
         "icon": "./assets/icons/icon.png",
         "sdkVersion": "26.0.0",
         "splash": {
             "image": "./assets/icons/loading.png",
-            "resizeMode": "cover",
-            "backgroundColor": "#FEF9B0",
+            "resizeMode": "contain",
+            "backgroundColor": "#FFFFFF",
             "hideExponentText": false
         }
     },
@@ -21,8 +21,8 @@
         "splash": {
             "image": "./assets/icons/loading.png",
             "tabletImage": "./assets/icons/loading.png",
-            "resizeMode": "cover",
-            "backgroundColor": "#FEF9B0",
+            "resizeMode": "contain",
+            "backgroundColor": "#FFFFFF",
             "hideExponentText": false
         }
     }

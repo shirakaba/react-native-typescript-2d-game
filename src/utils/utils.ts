@@ -2,7 +2,7 @@
 // Licensed under GPL; find at repo root, in LICENSE.txt.
 
 import {ImageStyle, Platform, ScaledSize, TextStyle, ViewStyle} from "react-native";
-import {itemLength} from "../components/Item";
+import {ITEM_LENGTH} from "../components/Item";
 
 export interface StyleObject {
     [key: string]: Partial<ComponentStyle>;
@@ -109,6 +109,7 @@ export function getPotentiallyUnoccupiedPointWithinWindow(
     windowDimensions: ScaledSize
 ): Point {
     const isIphoneX: boolean = Platform.OS === 'ios' && (screenDimensions.width === 812 || screenDimensions.height === 812);
+    console.log("IS IPHONE X: ", isIphoneX);
     // https://www.paintcodeapp.com/news/iphone-x-screen-demystified
     // https://developer.apple.com/ios/human-interface-guidelines/overview/iphone-x/
     const NOTCH_DEPTH: number = 30;
@@ -126,9 +127,6 @@ export function getPotentiallyUnoccupiedPointWithinWindow(
             height: isIphoneX ? (portrait ? windowHeight - (NOTCH_DEPTH + OPPOSITE_CURVE_DEPTH) : windowHeight) : windowHeight,
         },
         forbiddenZone,
-        {
-            width: itemLength,
-            height: itemLength
-        }
+        objectSize
     );
 }
