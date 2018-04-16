@@ -168,7 +168,7 @@ export class Box extends Component<Props, State> {
         });
     }
 
-    public static generateRandomOffscreenBoxPosition(redBoxLength: number, portrait: boolean, windowDimensions: ScaledSize): Point {
+    public static generateRandomOffscreenBoxPosition(redBoxLength: number, portrait: boolean, windowDimensions: ScaledSize, forceToRightHandSide: boolean = false): Point {
         const lengthSquared: number = Math.pow(redBoxLength, 2);
         const hypotenuse: number = Math.sqrt(lengthSquared + lengthSquared);
         const maxExtrusionAt45Degrees: number = hypotenuse - redBoxLength;
@@ -180,10 +180,12 @@ export class Box extends Component<Props, State> {
         const orientationCompensationX: number = portrait ? longestSideToShortestSideRatio : 1;
         const orientationCompensationY: number = portrait ? 1 : longestSideToShortestSideRatio;
 
+        const randomRight: number = getRandomInt(windowDimensions.width, maxBufferZone);
+
         return {
-            left: (getRandomInt(0, 1) ?
-                -getRandomInt(maxBufferZone, minBufferZone) :
-                getRandomInt(windowDimensions.width, maxBufferZone)) * orientationCompensationX,
+            left: forceToRightHandSide ?
+                (randomRight * orientationCompensationX) :
+                ((getRandomInt(0, 1) ? -getRandomInt(maxBufferZone, minBufferZone) : randomRight) * orientationCompensationX),
             top: (getRandomInt(0, 1) ?
                 -getRandomInt(maxBufferZone, minBufferZone) :
                 getRandomInt(windowDimensions.height, maxBufferZone)) * orientationCompensationY,

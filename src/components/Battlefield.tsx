@@ -83,7 +83,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
         loop: PropTypes.object,
     };
 
-    private generateNewGameState(windowDimensions: ScaledSize): BattlefieldState {
+    private generateNewGameState(windowDimensions: ScaledSize, forceRedBoxToAvoidNavigationSegue: boolean = false): BattlefieldState {
         const blueInitialLeft: number = windowDimensions.width / 2;
         const blueInitialTop: number = windowDimensions.height / 2;
 
@@ -122,7 +122,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
             currentFrameDate: date,
             colliding: false,
             redBoxTransform: {
-                ...Box.generateRandomOffscreenBoxPosition(this.redBoxInitialLength, this.props.portrait, windowDimensions),
+                ...Box.generateRandomOffscreenBoxPosition(this.redBoxInitialLength, this.props.portrait, windowDimensions, forceRedBoxToAvoidNavigationSegue),
                 rotation: 0
             },
             redBoxLength: this.redBoxInitialLength,
@@ -139,7 +139,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     constructor(props: BattlefieldProps) {
         super(props);
 
-        this.state = this.startGameState = this.generateNewGameState(this.props.windowDimensions);
+        this.state = this.startGameState = this.generateNewGameState(this.props.windowDimensions, true);
 
         this.update = this.update.bind(this);
     }
