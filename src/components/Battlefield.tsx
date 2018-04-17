@@ -233,7 +233,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
     }
 
     private beginTimedEvents(): void {
-        this.scaleInterval = setInterval(
+        this.scaleInterval = window.setInterval(
             () => {
                 if (this.state.redBoxLength === this.redBoxSizeLimit) return;
                 this.stateBatcher.batchState(
@@ -369,7 +369,7 @@ export class Battlefield extends Component<BattlefieldProps, BattlefieldState> {
 
     // TODO: Remedy this naive implementation, which may suffer race conditions.
     private restoreItem(index: number): void {
-        this.itemRestoreTimeouts[index] = setTimeout(
+        this.itemRestoreTimeouts[index] = window.setTimeout(
             () => {
                 const items: ItemProps[] = JSON.parse(JSON.stringify((this.stateBatcher.batchedState.items || this.state.items)));
                 items[index].consumed = false;
