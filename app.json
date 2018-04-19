@@ -19,19 +19,19 @@
             "resizeMode": "contain",
             "backgroundColor": "#FFFFFF",
             "hideExponentText": false
-        }
-    },
-    "ios": {
-        "supportsTablet": true,
-        "bundleIdentifier": "uk.co.bottledlogic.thebox.app",
-        "buildNumber": "1.8.2",
-        "icon": "./assets/icons/icon.png",
-        "splash": {
-            "image": "./assets/icons/loading.png",
-            "tabletImage": "./assets/icons/loading.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#FFFFFF",
-            "hideExponentText": false
+        },
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "uk.co.bottledlogic.thebox.app",
+            "buildNumber": "1.8.2",
+            "icon": "./assets/icons/icon.png",
+            "splash": {
+                "image": "./assets/icons/loading.png",
+                "tabletImage": "./assets/icons/loading.png",
+                "resizeMode": "contain",
+                "backgroundColor": "#FFFFFF",
+                "hideExponentText": false
+            }
         }
     }
 }
