@@ -5,7 +5,7 @@
         "slug": "the-box",
         "githubUrl": "https://github.com/shirakaba/react-native-typescript-2d-game",
         "privacy": "public",
-        "version": "1.8.1",
+        "version": "1.8.2",
         "primaryColor": "#ff7f00",
         "icon": "./assets/icons/icon.png",
         "updates": {
@@ -24,7 +24,7 @@
     "ios": {
         "supportsTablet": true,
         "bundleIdentifier": "uk.co.bottledlogic.thebox.app",
-        "buildNumber": "1.8.1",
+        "buildNumber": "1.8.2",
         "icon": "./assets/icons/icon.png",
         "splash": {
             "image": "./assets/icons/loading.png",

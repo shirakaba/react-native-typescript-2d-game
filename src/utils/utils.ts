@@ -109,7 +109,7 @@ export function getPotentiallyUnoccupiedPointWithinWindow(
     windowDimensions: ScaledSize
 ): Point {
     const isIphoneX: boolean = Platform.OS === 'ios' && (screenDimensions.width === 812 || screenDimensions.height === 812);
-    console.log("IS IPHONE X: ", isIphoneX);
+    // console.log("IS IPHONE X: ", isIphoneX);
     // https://www.paintcodeapp.com/news/iphone-x-screen-demystified
     // https://developer.apple.com/ios/human-interface-guidelines/overview/iphone-x/
     const NOTCH_DEPTH: number = 30;
