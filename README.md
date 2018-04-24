@@ -7,6 +7,12 @@
 
 ## About
 
+### TL;DR
+
+* Available on [expo.io](https://expo.io/@bottledlogic/the-box) for Android (untested) but maybe not iOS anymore (due to a recent change in [Apple policy](https://blog.expo.io/expo-sdk-v26-0-0-is-now-available-2be6d9805b31)).
+
+* Or on the [App Store](https://itunes.apple.com/us/app/plucky-box/id1375337845?ls=1&mt=8), with the title "Plucky Box" ("The Box" was sadly taken!).
+
 ### Background
 
 Around 2006, my brother made a simple Flash game called [The Box](https://birchlabs.co.uk/legacy/TheBox.html). In this game, you'd control a small blue box that has to run away from an ever-growing red box that is hunting it. The game would end upon the blue box being caught. You could attempt to live longer by picking up power-ups that would hinder the red box, but loss was ultimately inevitable.
@@ -26,11 +32,11 @@ This repository aims to reproduce The Box using modern mobile technologies. It's
 - [x] OPTIMISATION: Eliminate slowdown upon addition of extra components into tree (via `shouldComponentUpdate()`)
 - [x] GAMEPLAY: Add items
 - [x] UX: Integrate a router to show different screens (e.g. start, options, etc.)
+- [x] GAMEPLAY: Make the game end, and display a score (for time lived) upon collision
 
 #### To-do:
 
 - [ ] ARCHITECTURE: integrate Redux to manage state
-- [ ] GAMEPLAY: Make the game end, and display a score (for time lived) upon collision
 - [ ] OPTIMISATION: Investigate using [object pools](https://www.html5rocks.com/en/tutorials/speed/static-mem-pools/) to reduce heap load (as iOS simulator's garbage collection is noticeable)
 
 #### Investigated (but ditched):
@@ -41,7 +47,7 @@ This repository aims to reproduce The Box using modern mobile technologies. It's
 
 ## Technologies
 
-I'm using:
+See the dependencies section below for links to these projects. I'm using:
 
 * **Expo:** for rapid development of the app (allows you to develop without touching Xcode/Android Studio; is pre-configured with hot-reloading; has its own app store for instant publishing; provides debug tools, etc.).
 
@@ -49,9 +55,13 @@ I'm using:
 
 * **React Game Kit:** simply for providing a game loop by which to synchronise state/graphics updates.
 
+* **React Navigation:** to provide cross-platform navigation. Chosen over [React Native Navigation](https://github.com/wix/react-native-navigation) because: **1)** Expo recommends it; and **2)** React Native Navigation is flooded with hundreds of open issues because the core team have switched attention to producing a new major release.      
+
 * **TypeScript:** to write type-safe, refactorable, auto-completing code yet still output JavaScript (the language of React Native).
 
 For instructions on how exactly to make a project like this for yourself from scratch, read the repository wiki's [How I created this project](https://github.com/shirakaba/react-native-typescript-2d-game/wiki/How-I-created-this-project) page.
+
+For instructions on how to deploy an Expo app to the App Store, follow the repository wiki's [How I deployed this project to the App Store](https://github.com/shirakaba/react-native-typescript-2d-game/wiki/How-I-deployed-this-project-to-the-App-Store) page.
  
 
 ## Usage
