@@ -21,6 +21,7 @@
             "hideExponentText": false
         },
         "ios": {
+            "appStoreUrl": "https://itunes.apple.com/us/app/plucky-box/id1375337845?ls=1&mt=8",
             "supportsTablet": true,
             "bundleIdentifier": "uk.co.bottledlogic.thebox.app",
             "buildNumber": "1.8.2",
